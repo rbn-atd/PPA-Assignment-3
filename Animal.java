@@ -115,5 +115,5 @@ public abstract class Animal
     {
         isDiseased = !isDiseased;
     }
-    
+    //test
 }
