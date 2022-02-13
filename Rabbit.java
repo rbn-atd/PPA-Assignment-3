@@ -16,19 +16,20 @@ public class Rabbit extends Animal
     // Characteristics shared by all rabbits (class variables).
 
     // The age at which a rabbit can start to breed.
-    private static final int BREEDING_AGE = 3;
+    private static final int BREEDING_AGE = 1;
     // The age to which a rabbit can live.
     private static final int MAX_AGE = 40;
     // The likelihood of a rabbit breeding.
-    private static final double BREEDING_PROBABILITY = 0.13;
+    private static final double BREEDING_PROBABILITY = 0.9;
     //The likelihood of a birth being female;
     private static final double FEMALE_PROBABILITY = 0.5;
     // The maximum number of births.
-    private static final int MAX_LITTER_SIZE = 6;
+    private static final int MAX_LITTER_SIZE = 5;
     // A shared random number generator to control breeding.
     private static final Random rand = Randomizer.getRandom();
-    
-    private static final double DISEASE_PROBABILITY = 0.0001;
+    //The probability a rabbit becomes diseased during its existence.
+    //The program attempts to infect it every step.
+    private static final double DISEASE_PROBABILITY = 0.00001;
     
     private static final boolean isNocturnal = false;
     

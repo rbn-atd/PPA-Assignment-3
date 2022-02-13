@@ -17,18 +17,18 @@ public class Pig extends Animal
     // Characteristics shared by all pigs (class variables).
     
     // The age at which a pig can start to breed.
-    private static final int BREEDING_AGE = 13;
+    private static final int BREEDING_AGE = 10;
     // The age to which a pig can live.
-    private static final int MAX_AGE = 250;
+    private static final int MAX_AGE = 500;
     // The likelihood of a pig breeding.
-    private static final double BREEDING_PROBABILITY = 0.09;
+    private static final double BREEDING_PROBABILITY = 0.4;
     
     private static final double FEMALE_PROBABILITY = 0.5;
     // The maximum number of births.
     private static final int MAX_LITTER_SIZE = 4;
     // The food value of a single radish. In effect, this is the
     // number of steps a radish can go before it has to eat again.
-    private static final int PLANT_FOOD_VALUE = 60;
+    private static final int PLANT_FOOD_VALUE = 30;
     // A shared random number generator to control breeding.
     private static final Random rand = Randomizer.getRandom();
     //A flag which determines the time of day this animal moves.
@@ -112,7 +112,7 @@ public class Pig extends Animal
      */
     private void incrementHunger()
     {
-        foodLevel=foodLevel-3;
+        foodLevel=foodLevel-2;
         if(foodLevel <= 0) {
             setDead();
         }
@@ -128,6 +128,7 @@ public class Pig extends Animal
         Field field = getField();
         List<Location> adjacent = field.adjacentLocations(getLocation());
         Iterator<Location> it = adjacent.iterator();
+        Location foodLocation = null;
         while(it.hasNext()) {
             Location where = it.next();
             Object animal = field.getObjectAt(where);
@@ -136,11 +137,11 @@ public class Pig extends Animal
                 if(radish.isAlive()) { 
                     radish.setDead();
                     foodLevel = PLANT_FOOD_VALUE;
-                    return where;
+                    foodLocation = where;
                 }
             }
         }
-        return null;
+        return foodLocation;
     }
     
     /**

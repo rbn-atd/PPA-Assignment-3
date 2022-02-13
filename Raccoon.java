@@ -16,9 +16,9 @@ public class Raccoon extends Animal
     // The age at which a raccoon can start to breed.
     private static final int BREEDING_AGE = 10;
     // The age to which a raccoon can live.
-    private static final int MAX_AGE = 70;
+    private static final int MAX_AGE = 200;
     // The likelihood of a raccoon breeding.
-    private static final double BREEDING_PROBABILITY = 0.08;
+    private static final double BREEDING_PROBABILITY = 0.065;
     //The likelihood of a birth being female;
     private static final double FEMALE_PROBABILITY = 0.5;
     // The maximum number of births.

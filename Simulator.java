@@ -13,33 +13,36 @@ import java.awt.Color;
  */
 public class Simulator
 {   
-    //github test this is the real one
     // Constants representing configuration information for the simulation.
     // The default width for the grid.
     private static final int DEFAULT_WIDTH = 300;
     // The default depth of the grid.
     private static final int DEFAULT_DEPTH = 300;
     // The probability that a fox will be created in any given grid position.
-    private static final double FOX_CREATION_PROBABILITY = 0.05;
+    private static final double FOX_CREATION_PROBABILITY = 0.07;
     // The probability that a rabbit will be created in any given grid position.
-    private static final double RABBIT_CREATION_PROBABILITY = 0.08;
+    private static final double RABBIT_CREATION_PROBABILITY = 0.18;
     
-    private static final double EAGLE_CREATION_PROBABILITY = 0.000000000007;
+    private static final double EAGLE_CREATION_PROBABILITY = 0.07;
     
-    private static final double RADISH_CREATION_PROBABILITY = 0.000000000001;
+    private static final double RADISH_CREATION_PROBABILITY = 0.1;
     
-    private static final double PIG_CREATION_PROBABILITY = 0.000000000008;
+    private static final double PIG_CREATION_PROBABILITY = 0.087;
     
-    private static final double BEAR_CREATION_PROBABILITY = 0.06;
+    private static final double BEAR_CREATION_PROBABILITY = 0.05;
     
-    private static final double RACCOON_CREATION_PROBABILITY = 0.01;
+    private static final double RACCOON_CREATION_PROBABILITY =0;
     //The probability that a female of any animal will be created at any grid position
     private static final double FEMALE_CREATION_PROBABILITY = 0.5;
-    
+    //The probability a rabbit is already infected at creation
+    //Only rabbits will have such probability, acting as a vector.
     private static final double DISEASE_CREATION_PROBABILITY = 0.5;
 
     // List of animals in the field.
     private List<Animal> animals;
+    
+    private List<Animal> infected;
+    //private List<Plant> plants;
     // The current state of the field.
     private Field field;
     // The current step of the simulation.
@@ -48,7 +51,7 @@ public class Simulator
     private SimulatorView view;
     
     private List<BiomeFeature> features;
-    
+    //Starts the simulator on day time.
     private boolean isDay = true;
     
     /**
@@ -74,6 +77,8 @@ public class Simulator
         }
         
         animals = new ArrayList<>();
+        infected = new ArrayList<>();
+        //plants = new ArrayList<>();
 
         field = new Field(depth, width);
         
@@ -82,7 +87,7 @@ public class Simulator
         view = new SimulatorView(depth, width);
         view.setColor(Rabbit.class, Color.ORANGE);
         view.setColor(Fox.class, Color.BLUE);
-        view.setColor(Eagle.class, Color.LIGHT_GRAY);
+        view.setColor(Eagle.class, Color.YELLOW);
         view.setColor(Radish.class, Color.GREEN);
         view.setColor(Pig.class, Color.MAGENTA);
         view.setColor(Bear.class, Color.RED);
@@ -174,7 +179,7 @@ public class Simulator
         for(int row = 0; row < field.getDepth(); row++) {
             for(int col = 0; col < field.getWidth(); col++) {
                 if(rand.nextDouble() <= FOX_CREATION_PROBABILITY) {
-                    Location location = new Location(row, col);
+                   Location location = new Location(row, col);
                    if(rand.nextDouble() <= FEMALE_CREATION_PROBABILITY){
                         Fox fox = new Fox(true, field, location, true);
                         animals.add(fox);
@@ -208,7 +213,7 @@ public class Simulator
                 }
                 else if(rand.nextDouble() <= RADISH_CREATION_PROBABILITY) { 
                     Location location = new Location(row, col);
-                    Radish radish = new Radish(true, field, location, false);
+                    Radish radish = new Radish(true, field, location);
                     animals.add(radish);
                 }
                 else if(rand.nextDouble() <= PIG_CREATION_PROBABILITY) {

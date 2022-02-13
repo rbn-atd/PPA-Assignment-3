@@ -14,18 +14,20 @@ public class Eagle extends Animal
     // Characteristics shared by all eagles (class variables).
     
     // The age at which a eagle can start to breed.
-    private static final int BREEDING_AGE = 10;
+    private static final int BREEDING_AGE = 14;
     // The age to which a eagle can live.
-    private static final int MAX_AGE = 400;
+    private static final int MAX_AGE = 275;
     // The likelihood of a eagle breeding.
-    private static final double BREEDING_PROBABILITY = 0.08;
+    private static final double BREEDING_PROBABILITY = 0.09;
     
     private static final double FEMALE_PROBABILITY = 0.5;
     // The maximum number of births.
-    private static final int MAX_LITTER_SIZE = 2 ;
+    private static final int MAX_LITTER_SIZE = 5 ;
     // The food value of a single rabbit. In effect, this is the
     // number of steps an eagle can go before it has to eat again.
-    private static final int RABBIT_FOOD_VALUE = 17;
+    private static final int RABBIT_FOOD_VALUE = 20;
+    
+    private static final int RADISH_FOOD_VALUE = 12;
     // A shared random number generator to control breeding.
     private static final Random rand = Randomizer.getRandom();
     //boolean flag to determine if this animal is nocturnal or not
@@ -127,7 +129,7 @@ public class Eagle extends Animal
         Field field = getField();
         List<Location> adjacent = field.adjacentLocations(getLocation());
         Iterator<Location> it = adjacent.iterator();
-        Location rabbitLocation = null;
+        Location foodLocation = null;
         while(it.hasNext()) {
             Location where = it.next();
             Object animal = field.getObjectAt(where);
@@ -136,11 +138,19 @@ public class Eagle extends Animal
                 if(rabbit.isAlive()) { 
                     rabbit.setDead();
                     foodLevel = RABBIT_FOOD_VALUE;
-                    rabbitLocation = where;
+                    foodLocation = where;
                 }
             }
+            // else if(animal instanceof Radish) {
+                // Radish radish = (Radish) animal;
+                // if(radish.isAlive()) { 
+                    // radish.setDead();
+                    // foodLevel = RADISH_FOOD_VALUE;
+                    // foodLocation = where;
+                // }
+            // }
         }
-        return rabbitLocation;
+        return foodLocation;
     }
     
     /**

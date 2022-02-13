@@ -1,4 +1,3 @@
-
 import java.util.Random;
 import java.util.List;
 import java.util.Iterator;
@@ -13,20 +12,25 @@ import java.util.Iterator;
 public class Bear extends Animal
 {
     // instance variables - replace the example below with your own
-    private static final int BREEDING_AGE = 20;
-    private static final int MAX_AGE = 400;
-    private static final double BREEDING_PROBABILITY = 0.1;
+    private static final int BREEDING_AGE = 10;
+    private static final int MAX_AGE = 300;
+    private static final double BREEDING_PROBABILITY = 0.06;
     private static final double FEMALE_PROBABILITY = 0.5;
-    private static final int MAX_LITTER_SIZE = 2;
-    private static final int RABBIT_FOOD_VALUE = 8;
-    private static final int RACCOON_FOOD_VALUE = 12;
-    private static final int FOX_FOOD_VALUE = 15;
+    private static final int MAX_LITTER_SIZE = 4;
+    private static final int RABBIT_FOOD_VALUE = 15;
+    private static final int PIG_FOOD_VALUE = 25;
+    private static final int FOX_FOOD_VALUE = 20;
+    private static final double DISEASE_PROBABILITY = 0.35;
     private static final boolean isNocturnal = false;
     private static final Random rand = Randomizer.getRandom();
     
     private int age;
+    
     private int foodLevel;
+    
     private boolean isFemale;
+    
+    private int hungerLoss;
 
     /**
      * Constructor for objects of class Bear
@@ -35,13 +39,14 @@ public class Bear extends Animal
     {
         super(field, location, isNocturnal, isFemale);
         this.isFemale = isFemale;
+        this.hungerLoss = 1;
         if(randomAge) {
             age = rand.nextInt(MAX_AGE);
-            foodLevel = rand.nextInt((RABBIT_FOOD_VALUE+FOX_FOOD_VALUE)/2);
+            foodLevel = rand.nextInt((FOX_FOOD_VALUE+FOX_FOOD_VALUE)/2);
         }
         else {
             age = 0;
-            foodLevel = (RABBIT_FOOD_VALUE+FOX_FOOD_VALUE)/2;
+            foodLevel = (FOX_FOOD_VALUE+FOX_FOOD_VALUE)/2;
         }
     }
 
@@ -61,10 +66,20 @@ public class Bear extends Animal
      */
     private void incrementHunger()
     {
-        foodLevel--;
+        foodLevel = foodLevel - hungerLoss;
         if(foodLevel <= 0) {
             setDead();
         }
+    }
+    
+    /**
+     * Mutator method which increases a bears hunger loss when it eats
+     * an infected rabbit.
+     */
+    
+    private void diseaseEffect()
+    {
+      hungerLoss = 3;  
     }
     
     /**
@@ -75,7 +90,8 @@ public class Bear extends Animal
      * @param newBears List to return newly born bears
      */
     public void act(List<Animal> newBears)
-    {
+    {   
+        //hibernationCheck();
         incrementAge();
         incrementHunger();
         if(isAlive()) {
@@ -158,6 +174,7 @@ public class Bear extends Animal
         Field field = getField();
         List<Location> adjacent = field.adjacentLocations(getLocation());
         Iterator<Location> it = adjacent.iterator();
+        Location foodLocation = null;
         while(it.hasNext()) {
             Location where = it.next();
             Object animal = field.getObjectAt(where);
@@ -166,6 +183,11 @@ public class Bear extends Animal
                 if(rabbit.isAlive()) { 
                     rabbit.setDead();
                     foodLevel = RABBIT_FOOD_VALUE;
+                    if(rabbit.getIsDiseased() && rand.nextDouble() <= DISEASE_PROBABILITY){
+                        toggleIsDiseased();
+                        diseaseEffect();
+                        System.out.println("Bear diseased");
+                    }
                     return where;
                 }
             }
@@ -174,18 +196,27 @@ public class Bear extends Animal
                 if(fox.isAlive()) {
                     fox.setDead();
                     foodLevel = FOX_FOOD_VALUE;
-                    return where;
+                    foodLocation = where;
+                    if(fox.getIsDiseased() && rand.nextDouble() <= DISEASE_PROBABILITY){
+                        toggleIsDiseased();
+                        diseaseEffect();
+                        System.out.println("Bear diseased");
+                    }
                 }
             }    
-            else if(animal instanceof Raccoon) {
-                Raccoon raccoon = (Raccoon) animal;
-                if(raccoon.isAlive()) {
-                    raccoon.setDead();
-                    foodLevel = RACCOON_FOOD_VALUE;
-                    return where;
+            else if(animal instanceof Pig) {
+                Pig pig = (Pig) animal;
+                if(pig.isAlive()) {
+                    pig.setDead();
+                    foodLevel = PIG_FOOD_VALUE;
+                    foodLocation = where;
                 }
             }   
         }
-        return null;
+        return foodLocation;
     }
+    
+    // private void hibernationCheck(){
+        
+    // }
 }
