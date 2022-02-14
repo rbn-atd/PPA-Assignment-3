@@ -1,3 +1,4 @@
+
 import java.util.Random;
 import java.util.List;
 import java.util.Iterator;
@@ -12,41 +13,34 @@ import java.util.Iterator;
 public class Bear extends Animal
 {
     // instance variables - replace the example below with your own
-    private static final int BREEDING_AGE = 10;
-    private static final int MAX_AGE = 300;
-    private static final double BREEDING_PROBABILITY = 0.06;
-    private static final double FEMALE_PROBABILITY = 0.5;
-    private static final int MAX_LITTER_SIZE = 4;
-    private static final int RABBIT_FOOD_VALUE = 15;
-    private static final int PIG_FOOD_VALUE = 25;
-    private static final int FOX_FOOD_VALUE = 20;
-    private static final double DISEASE_PROBABILITY = 0.35;
-    private static final boolean isNocturnal = false;
+    private static final int BREEDING_AGE = 17;
+    private static final int MAX_AGE = 400;
+    private static final double BREEDING_PROBABILITY = 0.05;
+    private static final int MAX_LITTER_SIZE = 1;
+    private static final int RABBIT_FOOD_VALUE = 12;
+    private static final int FOX_FOOD_VALUE = 13;
+    private static final int PIG_FOOD_VALUE = 15;
+
+    private static final boolean isNocturnal = true;
     private static final Random rand = Randomizer.getRandom();
     
     private int age;
-    
     private int foodLevel;
     
-    private boolean isFemale;
-    
-    private int hungerLoss;
 
     /**
      * Constructor for objects of class Bear
      */
-    public Bear(boolean randomAge, Field field, Location location, boolean isFemale)
+    public Bear(boolean randomAge, Field field, Location location)
     {
-        super(field, location, isNocturnal, isFemale);
-        this.isFemale = isFemale;
-        this.hungerLoss = 1;
+        super(field, location, isNocturnal);
         if(randomAge) {
             age = rand.nextInt(MAX_AGE);
-            foodLevel = rand.nextInt((FOX_FOOD_VALUE+FOX_FOOD_VALUE)/2);
+            foodLevel = rand.nextInt((RABBIT_FOOD_VALUE+FOX_FOOD_VALUE+PIG_FOOD_VALUE)/3);
         }
         else {
             age = 0;
-            foodLevel = (FOX_FOOD_VALUE+FOX_FOOD_VALUE)/2;
+            foodLevel = (RABBIT_FOOD_VALUE+FOX_FOOD_VALUE+PIG_FOOD_VALUE)/3;
         }
     }
 
@@ -66,20 +60,10 @@ public class Bear extends Animal
      */
     private void incrementHunger()
     {
-        foodLevel = foodLevel - hungerLoss;
+        foodLevel--;
         if(foodLevel <= 0) {
             setDead();
         }
-    }
-    
-    /**
-     * Mutator method which increases a bears hunger loss when it eats
-     * an infected rabbit.
-     */
-    
-    private void diseaseEffect()
-    {
-      hungerLoss = 3;  
     }
     
     /**
@@ -90,12 +74,11 @@ public class Bear extends Animal
      * @param newBears List to return newly born bears
      */
     public void act(List<Animal> newBears)
-    {   
-        //hibernationCheck();
+    {
         incrementAge();
         incrementHunger();
         if(isAlive()) {
-            giveBirth(newBears);            
+            giveBirth(newBears);   
             // Move towards a source of food if found.
             Location newLocation = findFood();
             if(newLocation == null) { 
@@ -118,7 +101,8 @@ public class Bear extends Animal
      */
     private boolean canBreed()
     {
-        return age >= BREEDING_AGE;
+        //return age >= BREEDING_AGE;
+        return (age >= BREEDING_AGE && hasMate()/*&&!hasBredThisStep()*/);
     }
     
     /**
@@ -130,19 +114,7 @@ public class Bear extends Animal
     {
         int births = 0;
         if(canBreed() && rand.nextDouble() <= BREEDING_PROBABILITY) {
-            Field field = getField();
-            List<Location> adjacent = field.adjacentLocations(getLocation());
-            Iterator<Location> it = adjacent.iterator();
-            while(it.hasNext()) {
-                Location where = it.next();
-                Object animal = field.getObjectAt(where);
-                if (animal instanceof Bear){
-                    Bear bear = (Bear) animal;
-                    if(bear.getIsFemale() != getIsFemale()){
-                        births = rand.nextInt(MAX_LITTER_SIZE) + 1;
-                    }
-                }
-            }
+            births = rand.nextInt(MAX_LITTER_SIZE) + 1;
         }
         return births;
     }
@@ -159,7 +131,7 @@ public class Bear extends Animal
         int births = breed();
         for(int b = 0; b < births && free.size() > 0; b++) {
             Location loc = free.remove(0);
-            Bear young = new Bear(false, field, loc, isFemale);
+            Bear young = new Bear(false, field, loc);
             newBears.add(young);
         }
     }
@@ -174,7 +146,6 @@ public class Bear extends Animal
         Field field = getField();
         List<Location> adjacent = field.adjacentLocations(getLocation());
         Iterator<Location> it = adjacent.iterator();
-        Location foodLocation = null;
         while(it.hasNext()) {
             Location where = it.next();
             Object animal = field.getObjectAt(where);
@@ -183,40 +154,47 @@ public class Bear extends Animal
                 if(rabbit.isAlive()) { 
                     rabbit.setDead();
                     foodLevel = RABBIT_FOOD_VALUE;
-                    if(rabbit.getIsDiseased() && rand.nextDouble() <= DISEASE_PROBABILITY){
-                        toggleIsDiseased();
-                        diseaseEffect();
-                        System.out.println("Bear diseased");
-                    }
                     return where;
                 }
             }
-            else if(animal instanceof Fox) {
+            if(animal instanceof Fox) {
                 Fox fox = (Fox) animal;
                 if(fox.isAlive()) {
                     fox.setDead();
                     foodLevel = FOX_FOOD_VALUE;
-                    foodLocation = where;
-                    if(fox.getIsDiseased() && rand.nextDouble() <= DISEASE_PROBABILITY){
-                        toggleIsDiseased();
-                        diseaseEffect();
-                        System.out.println("Bear diseased");
-                    }
+                    return where;
                 }
-            }    
-            else if(animal instanceof Pig) {
+            }
+            if(animal instanceof Pig) {
                 Pig pig = (Pig) animal;
                 if(pig.isAlive()) {
                     pig.setDead();
                     foodLevel = PIG_FOOD_VALUE;
-                    foodLocation = where;
+                    return where;
                 }
-            }   
+            }
         }
-        return foodLocation;
+        return null;
     }
     
-    // private void hibernationCheck(){
-        
-    // }
+    /**
+     * Checks whether animal has a mate available
+     */
+    private boolean hasMate()
+    {
+        Field field = getField();
+        List<Location> adjacent = field.adjacentLocations(getLocation());
+        Iterator<Location> it = adjacent.iterator();
+        while(it.hasNext()) {
+            Location where = it.next();
+            Object animal = field.getObjectAt(where);
+            if(animal instanceof Bear) {
+                Bear bear = (Bear) animal;
+                if(bear.gender()!=this.gender()) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 }

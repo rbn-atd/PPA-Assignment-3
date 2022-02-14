@@ -1,4 +1,5 @@
 import java.util.List;
+import java.util.Random;
 
 /**
  * A class representing shared characteristics of animals.
@@ -16,23 +17,27 @@ public abstract class Animal
     private Location location;
     
     private boolean isNocturnal;
+    protected boolean male;
     
-    private boolean isFemale;
     
-    protected boolean isDiseased;
     /**
      * Create a new animal at location in field.
      * 
      * @param field The field currently occupied.
      * @param location The location within the field.
      */
-    public Animal(Field field, Location location, boolean isNocturnal, boolean isFemale)//, boolean isDiseased)
+    public Animal(Field field, Location location, boolean isNocturnal)
     {
         alive = true;
         this.field = field;
         this.isNocturnal = isNocturnal;
-        this.isFemale = isFemale;
-        this.isDiseased = false;
+        Random rand = Randomizer.getRandom();
+        if(rand.nextInt(2)==0) {
+            male=true;
+        }
+        else {
+            male=false;
+        }
         setLocation(location);
     }
     
@@ -102,18 +107,10 @@ public abstract class Animal
         return isNocturnal;
     }
     
-    protected boolean getIsFemale()
+    protected boolean gender()
     {
-        return isFemale;
+        return male;
     }
     
-    protected boolean getIsDiseased(){
-        return isDiseased;
-    }
-    
-    protected void toggleIsDiseased()
-    {
-        isDiseased = !isDiseased;
-    }
     
 }

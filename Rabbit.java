@@ -5,8 +5,6 @@ import java.util.Iterator;
 /**
  * A simple model of a rabbit.
  * Rabbits age, move, breed, and die.
- * Rabbits specialise in being able to breed rapidly
- * and birthing a larger litter.
  * 
  * @author David J. Barnes and Michael Kölling
  * @version 2016.02.29 (2)
@@ -16,20 +14,15 @@ public class Rabbit extends Animal
     // Characteristics shared by all rabbits (class variables).
 
     // The age at which a rabbit can start to breed.
-    private static final int BREEDING_AGE = 1;
+    private static final int BREEDING_AGE = 5;
     // The age to which a rabbit can live.
-    private static final int MAX_AGE = 40;
+    private static final int MAX_AGE = 30;
     // The likelihood of a rabbit breeding.
-    private static final double BREEDING_PROBABILITY = 0.9;
-    //The likelihood of a birth being female;
-    private static final double FEMALE_PROBABILITY = 0.5;
+    private static final double BREEDING_PROBABILITY = 0.45;
     // The maximum number of births.
-    private static final int MAX_LITTER_SIZE = 5;
+    private static final int MAX_LITTER_SIZE = 4;
     // A shared random number generator to control breeding.
     private static final Random rand = Randomizer.getRandom();
-    //The probability a rabbit becomes diseased during its existence.
-    //The program attempts to infect it every step.
-    private static final double DISEASE_PROBABILITY = 0.00001;
     
     private static final boolean isNocturnal = false;
     
@@ -37,9 +30,7 @@ public class Rabbit extends Animal
     
     // The rabbit's age.
     private int age;
-    //The rabbit's gender
-    private boolean isFemale;
-    
+
     /**
      * Create a new rabbit. A rabbit may be created with age
      * zero (a new born) or with a random age.
@@ -48,12 +39,10 @@ public class Rabbit extends Animal
      * @param field The field currently occupied.
      * @param location The location within the field.
      */
-    public Rabbit(boolean randomAge, Field field, Location location, boolean isFemale)//, boolean isDiseased)
+    public Rabbit(boolean randomAge, Field field, Location location)
     {
-        super(field, location, isNocturnal, isFemale);//, isDiseased);
+        super(field, location, isNocturnal);
         age = 0;
-        this.isFemale = isFemale;
-        //this.isDiseased = isDiseased;
         if(randomAge) {
             age = rand.nextInt(MAX_AGE);
         }
@@ -69,10 +58,6 @@ public class Rabbit extends Animal
         incrementAge();
         if(isAlive()) {
             giveBirth(newRabbits);
-            if (rand.nextDouble() <= DISEASE_PROBABILITY ){
-                toggleIsDiseased();
-                System.out.println("dis 1 diseased");
-            }
             // Try to move into a free location.
             Location newLocation = getField().freeAdjacentLocation(getLocation());
             if(newLocation != null) {
@@ -106,22 +91,13 @@ public class Rabbit extends Animal
     {
         // New rabbits are born into adjacent locations.
         // Get a list of adjacent free locations.
-        Random rand = Randomizer.getRandom();
         Field field = getField();
         List<Location> free = field.getFreeAdjacentLocations(getLocation());
         int births = breed();
         for(int b = 0; b < births && free.size() > 0; b++) {
             Location loc = free.remove(0);
-            //Rabbit young = new Rabbit(false, field, loc, isFemale);
-            if(rand.nextDouble() <= FEMALE_PROBABILITY){
-                     Rabbit young = new Rabbit(true, field, loc, true);
-                     newRabbits.add(young);
-            }
-            else{
-                     Rabbit young = new Rabbit(true, field, loc, false);
-                     newRabbits.add(young);
-            }
-            //newRabbits.add(young);
+            Rabbit young = new Rabbit(false, field, loc);
+            newRabbits.add(young);
         }
     }
         
@@ -134,37 +110,37 @@ public class Rabbit extends Animal
     {
         int births = 0;
         if(canBreed() && rand.nextDouble() <= BREEDING_PROBABILITY) {
-            Field field = getField();
-            List<Location> adjacent = field.adjacentLocations(getLocation());
-            Iterator<Location> it = adjacent.iterator();
-            while(it.hasNext()) {
-                Location where = it.next();
-                Object animal = field.getObjectAt(where);
-                if (animal instanceof Rabbit){
-                    Rabbit rabbit = (Rabbit) animal;
-                    if(rabbit.getIsFemale() != getIsFemale()){
-                        births = rand.nextInt(MAX_LITTER_SIZE) + 1;
-                    }
-                }
-            }
+            births = rand.nextInt(MAX_LITTER_SIZE) + 1;
         }
         return births;
     }
 
     /**
-     * A rabbit can breed if it has reached the breeding age.
-     * @return true if the rabbit can breed, false otherwise.
+     * A fox can breed if it has reached the breeding age.
      */
     private boolean canBreed()
     {
-        return age >= BREEDING_AGE;
+        return age >= BREEDING_AGE && hasMate();
     }
-    // /**
-     // * Getter function to return if the instance of an animal
-     // * is female or not.
-     // */
-    // private boolean getIsFemale()
-    // {
-        // return isFemale;
-    // }
+    
+    /**
+     * Checks whether animal has a mate available
+     */
+    private boolean hasMate()
+    {
+        Field field = getField();
+        List<Location> adjacent = field.adjacentLocations(getLocation());
+        Iterator<Location> it = adjacent.iterator();
+        while(it.hasNext()) {
+            Location where = it.next();
+            Object animal = field.getObjectAt(where);
+            if(animal instanceof Rabbit) {
+                Rabbit rabbit = (Rabbit) animal;
+                if(rabbit.gender()!=this.gender()) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 }

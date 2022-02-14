@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+
 /**
  * Represent a location in a rectangular grid.
  * 
@@ -70,4 +72,5 @@ public class Location
     {
         return col;
     }
+    
 }

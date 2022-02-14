@@ -24,13 +24,10 @@ public class SimulatorView extends JFrame
 
     private final String STEP_PREFIX = "Step: ";
     private final String POPULATION_PREFIX = "Population: ";
-    private final String DAYLABEL_PREFIX = "Time: ";
-    private final String STEPBUTTON_LABEL = "Step";
-    private final String SZNLABEL_PREFIX = "Season: ";
-    private JLabel stepLabel, population, infoLabel, dayLabel, seasonLabel;
-    private JButton stepButton;
+    private final String DAYLABEL_PREFIX = "Day: ";
+    private JLabel stepLabel, population, infoLabel, dayLabel;
     private FieldView fieldView;
-    private Simulator sim;
+    
     // A map for storing colors for participants in the simulation
     private Map<Class, Color> colors;
     // A statistics object computing and storing simulation information
@@ -51,8 +48,6 @@ public class SimulatorView extends JFrame
         infoLabel = new JLabel("  ", JLabel.CENTER);
         population = new JLabel(POPULATION_PREFIX, JLabel.CENTER);
         dayLabel = new JLabel(DAYLABEL_PREFIX, JLabel.CENTER);
-        seasonLabel = new JLabel(SZNLABEL_PREFIX, JLabel.CENTER);
-        stepButton = new JButton(STEPBUTTON_LABEL);
         
         setLocation(100, 50);
         
@@ -64,8 +59,6 @@ public class SimulatorView extends JFrame
             infoPane.add(stepLabel, BorderLayout.WEST);
             infoPane.add(infoLabel, BorderLayout.CENTER);
             infoPane.add(dayLabel, BorderLayout.CENTER);
-            infoPane.add(seasonLabel, BorderLayout.EAST);
-            infoPane.add(stepButton, BorderLayout.SOUTH);
         contents.add(infoPane, BorderLayout.NORTH);
         contents.add(fieldView, BorderLayout.CENTER);
         contents.add(population, BorderLayout.SOUTH);
@@ -78,9 +71,9 @@ public class SimulatorView extends JFrame
      * @param animalClass The animal's Class object.
      * @param color The color to be used for the given class.
      */
-    public void setColor(Class animalClass, Color color)
+    public void setColor(Class type, Color color)
     {
-        colors.put(animalClass, color);
+        colors.put(type, color);
     }
 
     /**
@@ -94,9 +87,9 @@ public class SimulatorView extends JFrame
     /**
      * @return The color to be used for a given class of animal.
      */
-    private Color getColor(Class animalClass)
+    private Color getColor(Class type)
     {
-        Color col = colors.get(animalClass);
+        Color col = colors.get(type);
         if(col == null) {
             // no color defined for this class
             return UNKNOWN_COLOR;
@@ -111,14 +104,14 @@ public class SimulatorView extends JFrame
      * @param step Which iteration step it is.
      * @param field The field whose status is to be displayed.
      */
-    public void showStatus(int step,String timeOfDay, Field field)
+    public void showStatus(int step,boolean time, Field field)
     {
         if(!isVisible()) {
             setVisible(true);
         }
             
         stepLabel.setText(STEP_PREFIX + step);
-        dayLabel.setText(DAYLABEL_PREFIX + timeOfDay);
+        dayLabel.setText(DAYLABEL_PREFIX + time);
         stats.reset();
         
         fieldView.preparePaint();
@@ -126,13 +119,13 @@ public class SimulatorView extends JFrame
         for(int row = 0; row < field.getDepth(); row++) {
             for(int col = 0; col < field.getWidth(); col++) {
                 Object animal = field.getObjectAt(row, col);
-                 if(animal != null) {
+                if(animal != null) {
                     if(animal instanceof Animal) {
                         stats.incrementCount(animal.getClass());
                         fieldView.drawMark(col, row, getColor(animal.getClass()));
                     }
                     else if(animal instanceof BiomeFeature) {
-                        fieldView.drawMark(col, row, Color.CYAN);
+                        fieldView.drawMark(col, row, getColor(animal.getClass()));
                     }
                 }
                 else {

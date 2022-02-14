@@ -6,7 +6,7 @@ import java.util.Random;
  * A simple model of a fox.
  * Foxes age, move, eat rabbits, and die.
  * 
- * @author David J. Barnes and Michael Kölling + Reuben Atendido
+ * @author David J. Barnes and Michael Kölling
  * @version 2016.02.29 (2)
  */
 public class Fox extends Animal
@@ -14,39 +14,35 @@ public class Fox extends Animal
     // Characteristics shared by all foxes (class variables).
     
     // The age at which a fox can start to breed.
-    private static final int BREEDING_AGE = 14;
+    private static final int BREEDING_AGE = 10;
     // The age to which a fox can live.
-    private static final int MAX_AGE = 275;
+    private static final int MAX_AGE = 200;
     // The likelihood of a fox breeding.
-    private static final double BREEDING_PROBABILITY = 0.15;
+    private static final double BREEDING_PROBABILITY = 0.1;
     // The maximum number of births.
-    private static final int MAX_LITTER_SIZE = 4;
+    private static final int MAX_LITTER_SIZE =3;
     // The food value of a single rabbit. In effect, this is the
     // number of steps a fox can go before it has to eat again.
-    private static final int RABBIT_FOOD_VALUE = 20;
+    private static final int RABBIT_FOOD_VALUE = 14;
     
-    //private static final int RACCOON_FOOD_VALUE = 5;
-    
-    // private static final int PIG_FOOD_VALUE = 25;
-    
-    private static final double FEMALE_PROBABILITY = 0.5;
-    //The probability a fox will become infected when eating an infected rabbit.
-    private static final double DISEASE_PROBABILITY = 0.5;
+    private static final int PIG_FOOD_VALUE = 25;
+    private static final int EAGLE_FOOD_VALUE = 12;
     // A shared random number generator to control breeding.
     private static final Random rand = Randomizer.getRandom();
     
     private static final boolean isNocturnal = true;
+    
+    
     // Individual characteristics (instance fields).
     // The fox's age.
     private int age;
     // The fox's food level, which is increased by eating rabbits.
     private int foodLevel;
     
-    private boolean isFemale;
+    
+    
     //private Simulator sim;
-    
-    private int hungerLoss;
-    
+
     /**
      * Create a fox. A fox can be created as a new born (age zero
      * and not hungry) or with a random age and food level.
@@ -55,18 +51,16 @@ public class Fox extends Animal
      * @param field The field currently occupied.
      * @param location The location within the field.
      */
-    public Fox(boolean randomAge, Field field, Location location, boolean isFemale)
+    public Fox(boolean randomAge, Field field, Location location)
     {
-        super(field, location, isNocturnal, isFemale);
-        this.isFemale = isFemale;
-        this.hungerLoss = 1;
+        super(field, location, isNocturnal);
         if(randomAge) {
             age = rand.nextInt(MAX_AGE);
-            foodLevel = rand.nextInt(RABBIT_FOOD_VALUE);
+            foodLevel = rand.nextInt((RABBIT_FOOD_VALUE+PIG_FOOD_VALUE+EAGLE_FOOD_VALUE)/3);
         }
         else {
             age = 0;
-            foodLevel = RABBIT_FOOD_VALUE;
+            foodLevel = (RABBIT_FOOD_VALUE+PIG_FOOD_VALUE+EAGLE_FOOD_VALUE)/3;
         }
     }
     
@@ -82,7 +76,7 @@ public class Fox extends Animal
         incrementAge();
         incrementHunger();
         if(isAlive()) {
-            giveBirth(newFoxes);            
+            giveBirth(newFoxes);
             // Move towards a source of food if found.
             Location newLocation = findFood();
             if(newLocation == null) { 
@@ -116,20 +110,10 @@ public class Fox extends Animal
      */
     private void incrementHunger()
     {
-        foodLevel = foodLevel - hungerLoss;
+        foodLevel--;
         if(foodLevel <= 0) {
             setDead();
         }
-    }
-    
-    /**
-     * Mutator method which increases a foxes hunger loss when it eats
-     * an infected rabbit.
-     */
-    
-    private void diseaseEffect()
-    {
-      hungerLoss = 5;  
     }
     
     /**
@@ -142,7 +126,6 @@ public class Fox extends Animal
         Field field = getField();
         List<Location> adjacent = field.adjacentLocations(getLocation());
         Iterator<Location> it = adjacent.iterator();
-        Location foodLocation = null;
         while(it.hasNext()) {
             Location where = it.next();
             Object animal = field.getObjectAt(where);
@@ -151,34 +134,29 @@ public class Fox extends Animal
                 if(rabbit.isAlive()) { 
                     rabbit.setDead();
                     foodLevel = RABBIT_FOOD_VALUE;
-                    foodLocation = where;
-                    if(rabbit.getIsDiseased() && rand.nextDouble() <= DISEASE_PROBABILITY){
-                        toggleIsDiseased();
-                        diseaseEffect();
-                        System.out.println("Fox diseased");
-                    }
+                    return where;
                 }
             }
-            // else if(animal instanceof Pig) {
-                // Pig pig = (Pig) animal;
-                // if(pig.isAlive()) {
-                    // pig.setDead();
-                    // foodLevel = PIG_FOOD_VALUE;
-                    // foodLocation = where;
-                // }
-            // }
-            // else if(animal instanceof Raccoon) {
-                // Raccoon raccoon = (Raccoon) animal;
-                // if(raccoon.isAlive()){
-                    // raccoon.setDead();
-                    // foodLevel = RACCOON_FOOD_VALUE;
-                    // foodLocation = where;
-                // }
-            // }
+            else if(animal instanceof Pig) {
+                Pig pig = (Pig) animal;
+                if(pig.isAlive()) {
+                    pig.setDead();
+                    foodLevel = PIG_FOOD_VALUE;
+                    return where;
+                }
+            }
+            else if(animal instanceof Eagle) {
+                Eagle eagle = (Eagle) animal;
+                if(eagle.isAlive()) {
+                    eagle.setDead();
+                    foodLevel = EAGLE_FOOD_VALUE;
+                    return where;
+                }
+            }
         }
-        return foodLocation;
+        return null;
     }
-        
+    
     /**
      * Check whether or not this fox is to give birth at this step.
      * New births will be made into free adjacent locations.
@@ -193,14 +171,8 @@ public class Fox extends Animal
         int births = breed();
         for(int b = 0; b < births && free.size() > 0; b++) {
             Location loc = free.remove(0);
-            if(rand.nextDouble() <= FEMALE_PROBABILITY){
-                     Fox young = new Fox(true, field, loc, true);
-                     newFoxes.add(young);
-            }
-            else{
-                     Fox young = new Fox(true, field, loc, false);
-                     newFoxes.add(young);
-            }
+            Fox young = new Fox(false, field, loc);
+            newFoxes.add(young);
         }
     }
         
@@ -213,19 +185,7 @@ public class Fox extends Animal
     {
         int births = 0;
         if(canBreed() && rand.nextDouble() <= BREEDING_PROBABILITY) {
-            Field field = getField();
-            List<Location> adjacent = field.adjacentLocations(getLocation());
-            Iterator<Location> it = adjacent.iterator();
-            while(it.hasNext()) {
-                Location where = it.next();
-                Object animal = field.getObjectAt(where);
-                if (animal instanceof Fox){
-                    Fox fox = (Fox) animal;
-                    if(fox.getIsFemale() != getIsFemale()){
-                        births = rand.nextInt(MAX_LITTER_SIZE) + 1;
-                    }
-                }
-            }
+            births = rand.nextInt(MAX_LITTER_SIZE) + 1;
         }
         return births;
     }
@@ -235,6 +195,29 @@ public class Fox extends Animal
      */
     private boolean canBreed()
     {
-        return age >= BREEDING_AGE;
+            return ((age >= BREEDING_AGE)&&hasMate());
     }
+    
+    /**
+     * Checks whether animal has a mate available
+     */
+    private boolean hasMate()
+    {
+        Field field = getField();
+        List<Location> adjacent = field.adjacentLocations(getLocation());
+        Iterator<Location> it = adjacent.iterator();
+        while(it.hasNext()) {
+            Location where = it.next();
+            Object animal = field.getObjectAt(where);
+            if(animal instanceof Fox) {
+                Fox fox = (Fox) animal;
+                if(fox.gender()!=this.gender()) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+    
+    
 }
