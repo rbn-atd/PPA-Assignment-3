@@ -26,8 +26,8 @@ public class SimulatorView extends JFrame
     private final String POPULATION_PREFIX = "Population: ";
     private final String DAYLABEL_PREFIX = "Time: ";
     private final String STEPBUTTON_LABEL = "Step";
-    private final String SZNLABEL_PREFIX = "Season: ";
-    private JLabel stepLabel, population, infoLabel, dayLabel, seasonLabel;
+    private final String WEATHERLABEL_PREFIX = "Weather: ";
+    private JLabel stepLabel, population, infoLabel, dayLabel, weatherLabel;
     private JButton stepButton;
     private FieldView fieldView;
     private Simulator sim;
@@ -51,7 +51,7 @@ public class SimulatorView extends JFrame
         infoLabel = new JLabel("  ", JLabel.CENTER);
         population = new JLabel(POPULATION_PREFIX, JLabel.CENTER);
         dayLabel = new JLabel(DAYLABEL_PREFIX, JLabel.CENTER);
-        seasonLabel = new JLabel(SZNLABEL_PREFIX, JLabel.CENTER);
+        weatherLabel = new JLabel(WEATHERLABEL_PREFIX, JLabel.CENTER);
         stepButton = new JButton(STEPBUTTON_LABEL);
         
         setLocation(100, 50);
@@ -64,7 +64,7 @@ public class SimulatorView extends JFrame
             infoPane.add(stepLabel, BorderLayout.WEST);
             infoPane.add(infoLabel, BorderLayout.CENTER);
             infoPane.add(dayLabel, BorderLayout.CENTER);
-            infoPane.add(seasonLabel, BorderLayout.EAST);
+            infoPane.add(weatherLabel, BorderLayout.EAST);
             infoPane.add(stepButton, BorderLayout.SOUTH);
         contents.add(infoPane, BorderLayout.NORTH);
         contents.add(fieldView, BorderLayout.CENTER);
@@ -111,7 +111,7 @@ public class SimulatorView extends JFrame
      * @param step Which iteration step it is.
      * @param field The field whose status is to be displayed.
      */
-    public void showStatus(int step,String timeOfDay, Field field)
+    public void showStatus(int step,String timeOfDay, String weather, Field field)
     {
         if(!isVisible()) {
             setVisible(true);
@@ -119,6 +119,7 @@ public class SimulatorView extends JFrame
             
         stepLabel.setText(STEP_PREFIX + step);
         dayLabel.setText(DAYLABEL_PREFIX + timeOfDay);
+        weatherLabel.setText(WEATHERLABEL_PREFIX + weather );
         stats.reset();
         
         fieldView.preparePaint();

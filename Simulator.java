@@ -31,12 +31,15 @@ public class Simulator
     
     private static final double BEAR_CREATION_PROBABILITY = 0.05;
     
-    private static final double RACCOON_CREATION_PROBABILITY =0;
+    private static final double RACCOON_CREATION_PROBABILITY = 0;
     //The probability that a female of any animal will be created at any grid position
     private static final double FEMALE_CREATION_PROBABILITY = 0.5;
     //The probability a rabbit is already infected at creation
     //Only rabbits will have such probability, acting as a vector.
     private static final double DISEASE_CREATION_PROBABILITY = 0.5;
+    
+    private static final double RAIN_PROBABILITY = 0.02;
+    private static final double SNOW_PROBABILITY = 0.009;
 
     // List of animals in the field.
     private List<Animal> animals;
@@ -53,6 +56,9 @@ public class Simulator
     private List<BiomeFeature> features;
     //Starts the simulator on day time.
     private boolean isDay = true;
+    
+    private boolean isRaining = false;
+    private boolean isSnowing = false;
     
     /**
      * Construct a simulation field with default size.
@@ -129,9 +135,17 @@ public class Simulator
     public void simulateOneStep()
     {
         step++;
+        Random rand = Randomizer.getRandom();
         //String timeTag = ""
         if(step % 2 == 0){
             toggleDayAndNight();
+        }
+        
+        if(rand.nextDouble() <= RAIN_PROBABILITY) {
+            toggleRain();
+        }
+        else if (rand.nextDouble() <= SNOW_PROBABILITY) {
+            toggleSnow();
         }
         
         // Provide space for newborn animals.
@@ -140,18 +154,17 @@ public class Simulator
         // Let all rabbits act.
         for(Iterator<Animal> it = animals.iterator(); it.hasNext(); ) {
             Animal animal = it.next();
-            if ((animal.getIsNocturnal() && !getIsDay()) || (!animal.getIsNocturnal() && getIsDay())) {
+            if ( (isSnowing == false || isRaining == false) && ( (animal.getIsNocturnal() && !getIsDay()) || (!animal.getIsNocturnal() && getIsDay())  )) {
                 animal.act(newAnimals);
             }
             if(! animal.isAlive()) {
                 it.remove();
             }
         }
-        
                
         // Add the newly born foxes and rabbits to the main lists.
         animals.addAll(newAnimals);
-        view.showStatus(step, getTimeOfDay(), field);
+        view.showStatus(step, getTimeOfDay(), getWeather(), field);
     }
         
     /**
@@ -164,7 +177,7 @@ public class Simulator
         populate();
         generateRiver(0.5, 0.6);
         // Show the starting state in the view.
-        view.showStatus(step, getTimeOfDay(), field);
+        view.showStatus(step, getTimeOfDay(), getWeather(), field);
     }
     
     /**
@@ -277,6 +290,14 @@ public class Simulator
         isDay = !isDay;
     }
     
+    private void toggleRain() {
+        isRaining = !isRaining;
+    }
+    
+    private void toggleSnow() {
+        isSnowing = !isSnowing;
+    }
+    
     /**
      * returns a String to be passed into the paramaters of
      * the showStatus function in SimulatorView.
@@ -288,6 +309,21 @@ public class Simulator
         }
         else{
             return "Day";
+        }
+    }
+    
+    private String getWeather() {
+        if( isRaining && !isSnowing ){
+            return "Raining";
+        }
+        else if ( isSnowing && !isRaining ){
+            return "Snowing";
+        }
+        else if ( isSnowing && isRaining ){
+            return "Cold Storm";
+        }
+        else{
+            return "Neutral";
         }
     }
     
