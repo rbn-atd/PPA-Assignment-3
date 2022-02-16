@@ -23,6 +23,4 @@ public class BiomeFeature
         this.field = field;
         this.location = location;
     }
-
-    
 }

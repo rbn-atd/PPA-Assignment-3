@@ -29,7 +29,7 @@ public class Rabbit extends Animal
     private static final Random rand = Randomizer.getRandom();
     //The probability a rabbit becomes diseased during its existence.
     //The program attempts to infect it every step.
-    private static final double DISEASE_PROBABILITY = 0.00001;
+    private static final double DISEASE_PROBABILITY = 0.05;
     
     private static final boolean isNocturnal = false;
     
@@ -71,7 +71,7 @@ public class Rabbit extends Animal
             giveBirth(newRabbits);
             if (rand.nextDouble() <= DISEASE_PROBABILITY ){
                 toggleIsDiseased();
-                System.out.println("dis 1 diseased");
+                System.out.println("Rabbit diseased");
             }
             // Try to move into a free location.
             Location newLocation = getField().freeAdjacentLocation(getLocation());

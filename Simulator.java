@@ -31,7 +31,7 @@ public class Simulator
     
     private static final double BEAR_CREATION_PROBABILITY = 0.05;
     
-    private static final double RACCOON_CREATION_PROBABILITY = 0;
+    private static final double RACCOON_CREATION_PROBABILITY = 0.07;
     //The probability that a female of any animal will be created at any grid position
     private static final double FEMALE_CREATION_PROBABILITY = 0.5;
     //The probability a rabbit is already infected at creation
@@ -40,6 +40,8 @@ public class Simulator
     
     private static final double RAIN_PROBABILITY = 0.02;
     private static final double SNOW_PROBABILITY = 0.009;
+    private static final double SUN_PROBABILITY = 0.75;
+    private static final double FOG_PROBABILITY = 0.01;
 
     // List of animals in the field.
     private List<Animal> animals;
@@ -59,6 +61,8 @@ public class Simulator
     
     private boolean isRaining = false;
     private boolean isSnowing = false;
+    private boolean isSunny = false;
+    private boolean isFoggy = false;
     
     /**
      * Construct a simulation field with default size.
@@ -122,7 +126,7 @@ public class Simulator
     {
         for(int step = 1; step <= numSteps && view.isViable(field); step++) {
             simulateOneStep();
-            //delay(500);   // uncomment this to run more slowly
+            //delay(750);   // uncomment this to run more slowly
         }
     }
     
@@ -146,6 +150,9 @@ public class Simulator
         }
         else if (rand.nextDouble() <= SNOW_PROBABILITY) {
             toggleSnow();
+        }
+        else if (rand.nextDouble() <= SUN_PROBABILITY) {
+            toggleSun();
         }
         
         // Provide space for newborn animals.
@@ -298,6 +305,10 @@ public class Simulator
         isSnowing = !isSnowing;
     }
     
+    private void toggleSun() {
+        isSunny = !isSunny;
+    }
+    
     /**
      * returns a String to be passed into the paramaters of
      * the showStatus function in SimulatorView.
@@ -313,14 +324,17 @@ public class Simulator
     }
     
     private String getWeather() {
-        if( isRaining && !isSnowing ){
+        if( isRaining && !isSnowing && !isSunny ){
             return "Raining";
         }
-        else if ( isSnowing && !isRaining ){
+        else if ( isSnowing && !isRaining && !isSunny ){
             return "Snowing";
         }
         else if ( isSnowing && isRaining ){
             return "Cold Storm";
+        }
+        else if ( isSunny && !isSnowing && ! isRaining){
+            return "Hot";
         }
         else{
             return "Neutral";

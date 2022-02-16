@@ -14,13 +14,13 @@ public class Bear extends Animal
     // instance variables - replace the example below with your own
     private static final int BREEDING_AGE = 10;
     private static final int MAX_AGE = 300;
-    private static final double BREEDING_PROBABILITY = 0.06;
+    private static final double BREEDING_PROBABILITY = 0.065;
     private static final double FEMALE_PROBABILITY = 0.5;
     private static final int MAX_LITTER_SIZE = 4;
     private static final int RABBIT_FOOD_VALUE = 15;
     private static final int PIG_FOOD_VALUE = 25;
     private static final int FOX_FOOD_VALUE = 20;
-    private static final double DISEASE_PROBABILITY = 0.35;
+    private static final double DISEASE_PROBABILITY = 0.7;
     private static final boolean isNocturnal = false;
     private static final Random rand = Randomizer.getRandom();
     
@@ -197,11 +197,11 @@ public class Bear extends Animal
                     fox.setDead();
                     foodLevel = FOX_FOOD_VALUE;
                     foodLocation = where;
-                    if(fox.getIsDiseased() && rand.nextDouble() <= DISEASE_PROBABILITY){
-                        toggleIsDiseased();
-                        diseaseEffect();
-                        System.out.println("Bear diseased");
-                    }
+                    // if(fox.getIsDiseased() && rand.nextDouble() <= DISEASE_PROBABILITY){
+                        // toggleIsDiseased();
+                        // diseaseEffect();
+                        // System.out.println("Bear diseased");
+                    // }
                 }
             }    
             else if(animal instanceof Pig) {
