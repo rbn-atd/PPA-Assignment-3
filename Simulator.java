@@ -6,10 +6,12 @@ import java.awt.Color;
 
 /**
  * A simple predator-prey simulator, based on a rectangular field
- * containing rabbits and foxes.
+ * containing rabbits, foxes, raccoons, bears, eagles, pigs, and radishes.
+ * Certain animals occaisionally get diseased.
  * 
  * @author David J. Barnes and Michael Kölling
- * @version 2016.02.29 (2)
+ *          with Reuben Atendido and Oliver Macpherson
+ * @version 2022.02.17 (3)
  */
 public class Simulator
 {   
@@ -22,47 +24,45 @@ public class Simulator
     private static final double FOX_CREATION_PROBABILITY = 0.07;
     // The probability that a rabbit will be created in any given grid position.
     private static final double RABBIT_CREATION_PROBABILITY = 0.18;
-    
+    // The probability that a eagle will be created in any given grid position.
     private static final double EAGLE_CREATION_PROBABILITY = 0.07;
-    
+    // The probability that a radish will be created in any given grid position.
     private static final double RADISH_CREATION_PROBABILITY = 0.1;
-    
+    // The probability that a pig will be created in any given grid position.
     private static final double PIG_CREATION_PROBABILITY = 0.087;
-    
+    // The probability that a bear will be created in any given grid position.
     private static final double BEAR_CREATION_PROBABILITY = 0.05;
-    
-    private static final double RACCOON_CREATION_PROBABILITY = 0.07;
-    //The probability that a female of any animal will be created at any grid position
+    // The probability that a raccoon will be created in any given grid position.
+    private static final double RACCOON_CREATION_PROBABILITY = 0.08;
+    //The probability that a female of any species will be created at any grid position
     private static final double FEMALE_CREATION_PROBABILITY = 0.5;
     //The probability a rabbit is already infected at creation
-    //Only rabbits will have such probability, acting as a vector.
-    private static final double DISEASE_CREATION_PROBABILITY = 0.5;
-    
+    //Only rabbits will have such probability, acting as a vector for the disease.
+    private static final double DISEASE_CREATION_PROBABILITY = 0.7;
+    //probability the weather will be set to rain
     private static final double RAIN_PROBABILITY = 0.02;
-    private static final double SNOW_PROBABILITY = 0.009;
+    //probability the weather will be set to snow
+    private static final double SNOW_PROBABILITY = 0.01;
+    //probabilty the weather will be set to sunny
     private static final double SUN_PROBABILITY = 0.75;
-    private static final double FOG_PROBABILITY = 0.01;
 
-    // List of animals in the field.
-    private List<Animal> animals;
+    // List of species in the field.
+    private List<Species> species;
+    // List of infected/diseased species in the field.
+    private List<Species> infected;
     
-    private List<Animal> infected;
-    //private List<Plant> plants;
     // The current state of the field.
     private Field field;
     // The current step of the simulation.
     private int step;
     // A graphical view of the simulation.
     private SimulatorView view;
-    
+    //Create an instance of weather
+    private Weather weather;
+    //Create an instance of time
+    private Time time;
+    //List of all biome features placed on the grid
     private List<BiomeFeature> features;
-    //Starts the simulator on day time.
-    private boolean isDay = true;
-    
-    private boolean isRaining = false;
-    private boolean isSnowing = false;
-    private boolean isSunny = false;
-    private boolean isFoggy = false;
     
     /**
      * Construct a simulation field with default size.
@@ -86,20 +86,24 @@ public class Simulator
             width = DEFAULT_WIDTH;
         }
         
-        animals = new ArrayList<>();
+        species= new ArrayList<>();
+        
         infected = new ArrayList<>();
-        //plants = new ArrayList<>();
-
+       
         field = new Field(depth, width);
+        
+        weather = new Weather();
+        
+        time = new Time();
         
         features = new ArrayList<>();
         // Create a view of the state of each location in the field.
         view = new SimulatorView(depth, width);
         view.setColor(Rabbit.class, Color.ORANGE);
         view.setColor(Fox.class, Color.BLUE);
-        view.setColor(Eagle.class, Color.YELLOW);
+        view.setColor(Eagle.class, Color.MAGENTA);
         view.setColor(Radish.class, Color.GREEN);
-        view.setColor(Pig.class, Color.MAGENTA);
+        view.setColor(Pig.class, Color.PINK);
         view.setColor(Bear.class, Color.RED);
         view.setColor(Raccoon.class, Color.DARK_GRAY);
         view.setColor(River.class, Color.CYAN);
@@ -126,7 +130,7 @@ public class Simulator
     {
         for(int step = 1; step <= numSteps && view.isViable(field); step++) {
             simulateOneStep();
-            //delay(750);   // uncomment this to run more slowly
+            delay(500);   // uncomment this to run more slowly
         }
     }
     
@@ -141,56 +145,58 @@ public class Simulator
         step++;
         Random rand = Randomizer.getRandom();
         //String timeTag = ""
+        //toggle between day and night every 2 steps
+        //This means 1 full day is 4 steps
         if(step % 2 == 0){
-            toggleDayAndNight();
+            time.toggleDayAndNight();
         }
-        
+        //toggle weather depending on their probabilities of occurring
         if(rand.nextDouble() <= RAIN_PROBABILITY) {
-            toggleRain();
+            weather.toggleRain();
         }
         else if (rand.nextDouble() <= SNOW_PROBABILITY) {
-            toggleSnow();
+            weather.toggleSnow();
         }
         else if (rand.nextDouble() <= SUN_PROBABILITY) {
-            toggleSun();
+            weather.toggleSun();
         }
         
-        // Provide space for newborn animals.
-        List<Animal> newAnimals = new ArrayList<>();
-
-        // Let all rabbits act.
-        for(Iterator<Animal> it = animals.iterator(); it.hasNext(); ) {
-            Animal animal = it.next();
-            if ( (isSnowing == false || isRaining == false) && ( (animal.getIsNocturnal() && !getIsDay()) || (!animal.getIsNocturnal() && getIsDay())  )) {
-                animal.act(newAnimals);
-            }
-            if(! animal.isAlive()) {
-                it.remove();
-            }
-        }
-               
+        // Provide space for newborn species.
+        List<Species> newSpecies = new ArrayList<>();
+        // Let all species act.
+        for(Iterator<Species> it = species.iterator(); it.hasNext(); ) {
+            Species species = it.next();
+            //species do not act if it is both snowing and raining, and only act in their respective times of day
+            if ((!weather.getSnow() || !weather.getRain()) && ( (species.getIsNocturnal() && !time.getIsDay()) || (!species.getIsNocturnal() && time.getIsDay())  )) {
+                    species.act(newSpecies);
+                }
+            if(!species.isAlive()) {
+                    it.remove();
+                }
+        }       
         // Add the newly born foxes and rabbits to the main lists.
-        animals.addAll(newAnimals);
-        view.showStatus(step, getTimeOfDay(), getWeather(), field);
-    }
+        species.addAll(newSpecies);
         
+        view.showStatus(step, time.getTimeOfDay(), weather.getWeather(), field);
+    }
+            
     /**
      * Reset the simulation to a starting position.
      */
     public void reset()
     {
         step = 0;
-        animals.clear();
+        species.clear();
         populate();
         generateRiver(0.5, 0.6);
         // Show the starting state in the view.
-        view.showStatus(step, getTimeOfDay(), getWeather(), field);
+        view.showStatus(step, time.getTimeOfDay(), weather.getWeather(), field);
     }
     
     /**
      * Randomly populate the field with foxes and rabbits.
      * This method has been modified to now consider a female probability
-     * Now animals are created with a flag indicating if it is female
+     * Now species are created with a flag indicating if it is female
      */
     private void populate()
     {
@@ -202,71 +208,71 @@ public class Simulator
                    Location location = new Location(row, col);
                    if(rand.nextDouble() <= FEMALE_CREATION_PROBABILITY){
                         Fox fox = new Fox(true, field, location, true);
-                        animals.add(fox);
+                        species.add(fox);
                     }
                     else{
                         Fox fox = new Fox(true, field, location, false);
-                        animals.add(fox);
+                        species.add(fox);
                     }
                 }
                 else if(rand.nextDouble() <= RABBIT_CREATION_PROBABILITY) {
                     Location location = new Location(row, col);
                     if(rand.nextDouble() <= FEMALE_CREATION_PROBABILITY){
                         Rabbit rabbit = new Rabbit(true, field, location, true);
-                        animals.add(rabbit);
+                        species.add(rabbit);
                     }
                     else{
                         Rabbit rabbit = new Rabbit(true, field, location, false);
-                        animals.add(rabbit);
+                        species.add(rabbit);
                     }
                 }
                 else if(rand.nextDouble() <= EAGLE_CREATION_PROBABILITY) { 
                     Location location = new Location(row, col);
                     if(rand.nextDouble() <= FEMALE_CREATION_PROBABILITY){
                         Eagle eagle = new Eagle(true, field, location, true);
-                        animals.add(eagle);
+                        species.add(eagle);
                     }
                     else{
                         Eagle eagle = new Eagle(true, field, location, false);
-                        animals.add(eagle);
+                        species.add(eagle);
                     }
                 }
                 else if(rand.nextDouble() <= RADISH_CREATION_PROBABILITY) { 
                     Location location = new Location(row, col);
                     Radish radish = new Radish(true, field, location);
-                    animals.add(radish);
+                    species.add(radish);
                 }
                 else if(rand.nextDouble() <= PIG_CREATION_PROBABILITY) {
                    Location location = new Location(row, col);
                    if(rand.nextDouble() <= FEMALE_CREATION_PROBABILITY){
                        Pig pig = new Pig(true, field, location, true);
-                       animals.add(pig);
+                       species.add(pig);
                     }
                    else{
                         Pig pig = new Pig(true, field, location, false);
-                        animals.add(pig);
+                        species.add(pig);
                     }
                 }
                 else if(rand.nextDouble() <= BEAR_CREATION_PROBABILITY) {
                     Location location = new Location(row, col);
                     if(rand.nextDouble() <= FEMALE_CREATION_PROBABILITY){
                         Bear bear = new Bear(true, field, location, true);
-                        animals.add(bear);
+                        species.add(bear);
                     }
                     else{
                         Bear bear = new Bear(true, field, location, false);
-                        animals.add(bear);
+                        species.add(bear);
                     }
                 }
                 else if(rand.nextDouble() <= RACCOON_CREATION_PROBABILITY) {
                     Location location = new Location(row, col);
                     if(rand.nextDouble() <= FEMALE_CREATION_PROBABILITY){
                         Raccoon raccoon = new Raccoon(true, field, location, true);
-                        animals.add(raccoon);
+                        species.add(raccoon);
                     }
                     else{
                         Raccoon raccoon = new Raccoon(true, field, location, false);
-                        animals.add(raccoon);
+                        species.add(raccoon);
                     }
                 }
                 // else leave the location empty.
@@ -287,67 +293,7 @@ public class Simulator
             // wake up
         }
     }
-    
-    /**
-     * Toggles isDay between true and false
-     * acts as an indicator for when it is day
-     * allowing a day night cycle to exist
-     */
-    private void toggleDayAndNight() {
-        isDay = !isDay;
-    }
-    
-    private void toggleRain() {
-        isRaining = !isRaining;
-    }
-    
-    private void toggleSnow() {
-        isSnowing = !isSnowing;
-    }
-    
-    private void toggleSun() {
-        isSunny = !isSunny;
-    }
-    
-    /**
-     * returns a String to be passed into the paramaters of
-     * the showStatus function in SimulatorView.
-     * Appears on the GUI to indicate the time of day to the user
-     */
-    private String getTimeOfDay() {
-        if(!isDay){
-            return "Night";
-        }
-        else{
-            return "Day";
-        }
-    }
-    
-    private String getWeather() {
-        if( isRaining && !isSnowing && !isSunny ){
-            return "Raining";
-        }
-        else if ( isSnowing && !isRaining && !isSunny ){
-            return "Snowing";
-        }
-        else if ( isSnowing && isRaining ){
-            return "Cold Storm";
-        }
-        else if ( isSunny && !isSnowing && ! isRaining){
-            return "Hot";
-        }
-        else{
-            return "Neutral";
-        }
-    }
-    
-    /**
-     * returns the current state of the isDay flag.
-     */
-    private boolean getIsDay()
-    {
-        return isDay;
-    }
+   
     
     /**
      * Create a river

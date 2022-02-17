@@ -5,14 +5,14 @@ import java.util.Iterator;
 /**
  * A simple model of a pig
  * Pigs age, move, eat radishes and die.
- * Pigs are designed to live moderately long
- * and gain a larger amount of food value but also
- * lose 2 times as much hunger as other animals.
+ * Pigs live extremely long for some reason
+ * They gain a larger amount of food value via radishes but also
+ * lose 2 times as much hunger as other species.
  *
- * @author Reuben Atendido
- * @version (a version number or a date)
+ * @author Reuben Atendido and Oliver Macpherson
+ * @version 1
  */
-public class Pig extends Animal
+public class Pig extends Species
 {
     // Characteristics shared by all pigs (class variables).
     
@@ -31,7 +31,7 @@ public class Pig extends Animal
     private static final int PLANT_FOOD_VALUE = 30;
     // A shared random number generator to control breeding.
     private static final Random rand = Randomizer.getRandom();
-    //A flag which determines the time of day this animal moves.
+    //A flag which determines the time of day this species moves.
     private static final boolean isNocturnal = false;
     // Individual characteristics (instance fields).
     // The pig's age.
@@ -48,7 +48,7 @@ public class Pig extends Animal
      * @param randomAge If true, the pig will have random age and hunger level.
      * @param field The field currently occupied.
      * @param location The location within the field.
-     * @param isNocturnal The flag indicating what time of day this animal moves.
+     * @param isNocturnal The flag indicating what time of day this species moves.
      * @param isFemale The flag indicating if the instance of a pig is female.
      */
     public Pig(boolean randomAge, Field field, Location location, boolean isFemale)
@@ -72,7 +72,7 @@ public class Pig extends Animal
      * @param field The field currently occupied.
      * @param newFoxes A list to return newly born pigs.
      */
-    public void act(List<Animal> newPig)
+    public void act(List<Species> newPig)
     {
         incrementAge();
         incrementHunger();
@@ -108,7 +108,7 @@ public class Pig extends Animal
     
     /**
      * Make this pig more hungry. This could result in the pig's death.
-     * Pig's are designed to lose their hunger much faster than other animals.
+     * Pig's lose 2 food level vs the usual 1
      */
     private void incrementHunger()
     {
@@ -120,7 +120,7 @@ public class Pig extends Animal
     
     /**
      * Look for radishes adjacent to the current location.
-     * Only the first radishe detected is eaten.
+     * All adjacent radishes detected are eaten.
      * @return Where food was found, or null if it wasn't.
      */
     private Location findFood()
@@ -131,9 +131,9 @@ public class Pig extends Animal
         Location foodLocation = null;
         while(it.hasNext()) {
             Location where = it.next();
-            Object animal = field.getObjectAt(where);
-            if(animal instanceof Radish) {
-                Radish radish = (Radish) animal;
+            Object species = field.getObjectAt(where);
+            if(species instanceof Radish) {
+                Radish radish = (Radish) species;
                 if(radish.isAlive()) { 
                     radish.setDead();
                     foodLevel = PLANT_FOOD_VALUE;
@@ -149,7 +149,7 @@ public class Pig extends Animal
      * New births will be made into free adjacent locations.
      * @param newPigs A list to return newly born pigs.
      */
-    private void giveBirth(List<Animal> newPigs)
+    private void giveBirth(List<Species> newPigs)
     {
         // New foxes are born into adjacent locations.
         // Get a list of adjacent free locations.
@@ -177,9 +177,9 @@ public class Pig extends Animal
             Iterator<Location> it = adjacent.iterator();
             while(it.hasNext()) {
                 Location where = it.next();
-                Object animal = field.getObjectAt(where);
-                if (animal instanceof Pig){
-                    Pig pig = (Pig) animal;
+                Object species = field.getObjectAt(where);
+                if (species instanceof Pig){
+                    Pig pig = (Pig) species;
                     if(pig.getIsFemale() != getIsFemale()){
                         births = rand.nextInt(MAX_LITTER_SIZE) + 1;
                     }

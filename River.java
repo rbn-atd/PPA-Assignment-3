@@ -1,9 +1,10 @@
 
 /**
- * Write a description of class River here.
+ * Model of a river, taking up grid space and only allowing certain animals to pass through it.
+ * only certain animals may spawn aswell.
  *
- * @author (your name)
- * @version (a version number or a date)
+ * @author Reuben Atendido and Oliver Macpherson
+ * @version 1
  */
 public class River extends BiomeFeature
 {

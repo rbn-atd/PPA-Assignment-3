@@ -1,10 +1,11 @@
 import java.util.ArrayList;
 
 /**
- * Write a description of class BiomeFeatures here.
+ * Simple model of broad biome features for the grid e.g.
+ * rivers 
  *
- * @author (your name)
- * @version (a version number or a date)
+ * @author Oliver Macpherson
+ * @version 1
  */
 public class BiomeFeature
 {

@@ -1,33 +1,60 @@
 
 /**
- * Write a description of class Weather here.
+ * A simple model of 5 different weather states utilising 3 boolean weather flags
+ * A specific combination of flags will cause the species on the grid to completely 
+ * stop acting. Determines the weather text returned to be displayed on the gui.
  *
- * @author (your name)
- * @version (a version number or a date)
+ * @author Reuben Atendido and Oliver Macpherson
+ * @version 1
  */
 public class Weather
 {
     // instance variables - replace the example below with your own
-    private int x;
-
-    /**
-     * Constructor for objects of class Weather
-     */
-    public Weather()
-    {
-        // initialise instance variables
-        x = 0;
+    private boolean isRaining = false;
+    private boolean isSnowing = false;
+    private boolean isSunny = false;
+    
+    public String getWeather() {
+        String weathertype = "Neutral";
+        if( isRaining && !isSnowing && !isSunny ){
+            return "Drab Rain";
+        }
+        else if ( isSnowing && !isRaining && !isSunny){
+            return "Nicely Snowing";
+        }
+        else if ( isSnowing && isRaining){
+            return "Totally Frozen";
+        }
+        else if ( isSunny && !isSnowing && !isRaining){
+            return "Exceedingly Hot";
+        }
+        else{
+            return "Clear Day";
+        }
     }
-
-    /**
-     * An example of a method - replace this comment with your own
-     *
-     * @param  y  a sample parameter for a method
-     * @return    the sum of x and y
-     */
-    public int sampleMethod(int y)
-    {
-        // put your code here
-        return x + y;
+    
+    public void toggleRain() {
+        isRaining = !isRaining;
     }
+    
+    public void toggleSnow() {
+        isSnowing = !isSnowing;
+    }
+    
+    public void toggleSun() {
+        isSunny = !isSunny;
+    }
+    
+    public boolean getSnow() {
+        return  isSnowing;
+    }
+    
+    public boolean getRain() {
+        return isRaining;
+    }
+    
+    public boolean getSun() {
+        return isSunny;
+    }
+    
 }

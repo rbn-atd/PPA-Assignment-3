@@ -5,11 +5,13 @@ import java.util.Iterator;
 /**
  * A simple model of a raccoon;
  * Raccoons age, move, eat radish and die.
+ * Essentially vegetarian foxes, only eating radishes.
+ * They live shorter but yield a larger litter size.
  *
- * @author Reuben Atendido
- * @version (a version number or a date)
+ * @author Reuben Atendido and Oliver Macpherson
+ * @version 1
  */
-public class Raccoon extends Animal
+public class Raccoon extends Species
 {
     // Characteristics shared by all raccoon (class variables).
 
@@ -18,7 +20,7 @@ public class Raccoon extends Animal
     // The age to which a raccoon can live.
     private static final int MAX_AGE = 200;
     // The likelihood of a raccoon breeding.
-    private static final double BREEDING_PROBABILITY = 0.065;
+    private static final double BREEDING_PROBABILITY = 0.135;
     //The likelihood of a birth being female;
     private static final double FEMALE_PROBABILITY = 0.5;
     // The maximum number of births.
@@ -27,7 +29,7 @@ public class Raccoon extends Animal
     private static final int RADISH_FOOD_VALUE = 20;
     // A shared random number generator to control breeding.
     private static final Random rand = Randomizer.getRandom();
-    
+    //
     private static final boolean isNocturnal = true;
     
     // Individual characteristics (instance fields).
@@ -66,7 +68,7 @@ public class Raccoon extends Animal
      * around. Sometimes it will breed or die of old age.
      * @param newRaccoons A list to return newly born raccoon.
      */
-    public void act(List<Animal> newRaccoons)
+    public void act(List<Species> newRaccoons)
     {
         incrementAge();
         incrementHunger();
@@ -117,7 +119,7 @@ public class Raccoon extends Animal
      * New births will be made into free adjacent locations.
      * @param newRaccoons A list to return newly born raccoon.
      */
-    private void giveBirth(List<Animal> newRaccoons)
+    private void giveBirth(List<Species> newRaccoons)
     {
         // New rabbits are born into adjacent locations.
         // Get a list of adjacent free locations.
@@ -152,9 +154,9 @@ public class Raccoon extends Animal
         Location radishLocation = null;
         while(it.hasNext()) {
             Location where = it.next();
-            Object animal = field.getObjectAt(where);
-            if(animal instanceof Radish ) {
-                Radish radish = (Radish) animal;
+            Object species = field.getObjectAt(where);
+            if(species instanceof Radish ) {
+                Radish radish = (Radish) species;
                 if(radish.isAlive()) { 
                     radish.setDead();
                     foodLevel = RADISH_FOOD_VALUE;
@@ -179,9 +181,9 @@ public class Raccoon extends Animal
             Iterator<Location> it = adjacent.iterator();
             while(it.hasNext()) {
                 Location where = it.next();
-                Object animal = field.getObjectAt(where);
-                if (animal instanceof Raccoon){
-                    Raccoon raccoon = (Raccoon) animal;
+                Object species = field.getObjectAt(where);
+                if (species instanceof Raccoon){
+                    Raccoon raccoon = (Raccoon) species;
                     if(raccoon.getIsFemale() != getIsFemale()){
                         births = rand.nextInt(MAX_LITTER_SIZE) + 1;
                     }
@@ -198,14 +200,5 @@ public class Raccoon extends Animal
     private boolean canBreed()
     {
         return age >= BREEDING_AGE;
-    }
-    
-    /**
-     * Getter function to return if the instance of an animal
-     * is female or not.
-     */
-    private boolean isFemale()
-    {
-        return isFemale;
     }
 }

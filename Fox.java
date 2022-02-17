@@ -4,12 +4,15 @@ import java.util.Random;
 
 /**
  * A simple model of a fox.
- * Foxes age, move, eat rabbits, and die.
- * 
+ * Foxes age, move, eat rabbits and raccoons, and die.
+ * Foxes are the most average of species, not having any outstanding
+ * traits. They thrive off the abundance of rabbits, but are also probable to becoming
+ * infected if eating a diseased rabbit.
+ *  
  * @author David J. Barnes and Michael Kölling + Reuben Atendido
  * @version 2016.02.29 (2)
  */
-public class Fox extends Animal
+public class Fox extends Species
 {
     // Characteristics shared by all foxes (class variables).
     
@@ -18,23 +21,19 @@ public class Fox extends Animal
     // The age to which a fox can live.
     private static final int MAX_AGE = 275;
     // The likelihood of a fox breeding.
-    private static final double BREEDING_PROBABILITY = 0.125;
+    private static final double BREEDING_PROBABILITY = 0.13;
     // The maximum number of births.
     private static final int MAX_LITTER_SIZE = 4;
-    // The food value of a single rabbit. In effect, this is the
+    // The food values of a single rabbit. In effect, this is the
     // number of steps a fox can go before it has to eat again.
     private static final int RABBIT_FOOD_VALUE = 20;
-    
-    //private static final int RACCOON_FOOD_VALUE = 5;
-    
-    // private static final int PIG_FOOD_VALUE = 25;
-    
+    //Probability this species is female
     private static final double FEMALE_PROBABILITY = 0.5;
     //The probability a fox will become infected when eating an infected rabbit.
     private static final double DISEASE_PROBABILITY = 0.8;
     // A shared random number generator to control breeding.
     private static final Random rand = Randomizer.getRandom();
-    
+    //This species only acts at night.
     private static final boolean isNocturnal = true;
     // Individual characteristics (instance fields).
     // The fox's age.
@@ -43,7 +42,6 @@ public class Fox extends Animal
     private int foodLevel;
     
     private boolean isFemale;
-    //private Simulator sim;
     
     private int hungerLoss;
     
@@ -77,7 +75,7 @@ public class Fox extends Animal
      * @param field The field currently occupied.
      * @param newFoxes A list to return newly born foxes.
      */
-    public void act(List<Animal> newFoxes)
+    public void act(List<Species> newFoxes)
     {   
         incrementAge();
         incrementHunger();
@@ -129,13 +127,13 @@ public class Fox extends Animal
     
     private void diseaseEffect()
     {
-      hungerLoss = 10;  
+      hungerLoss = 7;  
     }
     
     /**
      * Look for rabbits adjacent to the current location.
-     * Only the first live rabbit is eaten.
-     * @return Where food was found, or null if it wasn't.
+     * Modified so that the fox eats every adjacent species.
+     * @return Where food was found
      */
     private Location findFood()
     {
@@ -145,9 +143,9 @@ public class Fox extends Animal
         Location foodLocation = null;
         while(it.hasNext()) {
             Location where = it.next();
-            Object animal = field.getObjectAt(where);
-            if(animal instanceof Rabbit ) {
-                Rabbit rabbit = (Rabbit) animal;
+            Object species = field.getObjectAt(where);
+            if(species instanceof Rabbit ) {
+                Rabbit rabbit = (Rabbit) species;
                 if(rabbit.isAlive()) { 
                     rabbit.setDead();
                     foodLevel = RABBIT_FOOD_VALUE;
@@ -159,22 +157,6 @@ public class Fox extends Animal
                     }
                 }
             }
-            // else if(animal instanceof Pig) {
-                // Pig pig = (Pig) animal;
-                // if(pig.isAlive()) {
-                    // pig.setDead();
-                    // foodLevel = PIG_FOOD_VALUE;
-                    // foodLocation = where;
-                // }
-            // }
-            // else if(animal instanceof Raccoon) {
-                // Raccoon raccoon = (Raccoon) animal;
-                // if(raccoon.isAlive()){
-                    // raccoon.setDead();
-                    // foodLevel = RACCOON_FOOD_VALUE;
-                    // foodLocation = where;
-                // }
-            // }
         }
         return foodLocation;
     }
@@ -182,9 +164,10 @@ public class Fox extends Animal
     /**
      * Check whether or not this fox is to give birth at this step.
      * New births will be made into free adjacent locations.
+     * Modified to randomly generate female foxes
      * @param newFoxes A list to return newly born foxes.
      */
-    private void giveBirth(List<Animal> newFoxes)
+    private void giveBirth(List<Species> newFoxes)
     {
         // New foxes are born into adjacent locations.
         // Get a list of adjacent free locations.
@@ -207,6 +190,7 @@ public class Fox extends Animal
     /**
      * Generate a number representing the number of births,
      * if it can breed.
+     * Checks for if the adjacent animal is a fox and is opposite sex.
      * @return The number of births (may be zero).
      */
     private int breed()
@@ -218,9 +202,9 @@ public class Fox extends Animal
             Iterator<Location> it = adjacent.iterator();
             while(it.hasNext()) {
                 Location where = it.next();
-                Object animal = field.getObjectAt(where);
-                if (animal instanceof Fox){
-                    Fox fox = (Fox) animal;
+                Object species = field.getObjectAt(where);
+                if (species instanceof Fox){
+                    Fox fox = (Fox) species;
                     if(fox.getIsFemale() != getIsFemale()){
                         births = rand.nextInt(MAX_LITTER_SIZE) + 1;
                     }

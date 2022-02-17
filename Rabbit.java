@@ -5,13 +5,14 @@ import java.util.Iterator;
 /**
  * A simple model of a rabbit.
  * Rabbits age, move, breed, and die.
- * Rabbits specialise in being able to breed rapidly
- * and birthing a larger litter.
+ * Designed as purely a prey species they survive by having
+ * an exceptionally high breeding rate as well as birthing a larger litter.
  * 
  * @author David J. Barnes and Michael Kölling
- * @version 2016.02.29 (2)
+ *          with Reuben Atendido and Oliver Macpherson
+ * @version 2022.02.17 (2)
  */
-public class Rabbit extends Animal
+public class Rabbit extends Species
 {
     // Characteristics shared by all rabbits (class variables).
 
@@ -29,8 +30,8 @@ public class Rabbit extends Animal
     private static final Random rand = Randomizer.getRandom();
     //The probability a rabbit becomes diseased during its existence.
     //The program attempts to infect it every step.
-    private static final double DISEASE_PROBABILITY = 0.05;
-    
+    private static final double DISEASE_PROBABILITY = 0.1;
+    //This animal is not nocturnal (acts only during day)
     private static final boolean isNocturnal = false;
     
     // Individual characteristics (instance fields).
@@ -62,9 +63,10 @@ public class Rabbit extends Animal
     /**
      * This is what the rabbit does most of the time - it runs 
      * around. Sometimes it will breed or die of old age.
+     * This method has been modified to possibly disease a rabbit every step.
      * @param newRabbits A list to return newly born rabbits.
      */
-    public void act(List<Animal> newRabbits)
+    public void act(List<Species> newRabbits)
     {
         incrementAge();
         if(isAlive()) {
@@ -100,9 +102,10 @@ public class Rabbit extends Animal
     /**
      * Check whether or not this rabbit is to give birth at this step.
      * New births will be made into free adjacent locations.
+     * Method has been modified to randomly toggle rabbits to be female.
      * @param newRabbits A list to return newly born rabbits.
      */
-    private void giveBirth(List<Animal> newRabbits)
+    private void giveBirth(List<Species> newRabbits)
     {
         // New rabbits are born into adjacent locations.
         // Get a list of adjacent free locations.
@@ -128,6 +131,8 @@ public class Rabbit extends Animal
     /**
      * Generate a number representing the number of births,
      * if it can breed.
+     * Method has been modified to now make the species check adjacent fields
+     * for a species of the same subtype as well as opposite isFemale flag i.e can only breed if opposite sexes.
      * @return The number of births (may be zero).
      */
     private int breed()
@@ -139,9 +144,9 @@ public class Rabbit extends Animal
             Iterator<Location> it = adjacent.iterator();
             while(it.hasNext()) {
                 Location where = it.next();
-                Object animal = field.getObjectAt(where);
-                if (animal instanceof Rabbit){
-                    Rabbit rabbit = (Rabbit) animal;
+                Object species = field.getObjectAt(where);
+                if (species instanceof Rabbit){
+                    Rabbit rabbit = (Rabbit) species;
                     if(rabbit.getIsFemale() != getIsFemale()){
                         births = rand.nextInt(MAX_LITTER_SIZE) + 1;
                     }
@@ -159,12 +164,4 @@ public class Rabbit extends Animal
     {
         return age >= BREEDING_AGE;
     }
-    // /**
-     // * Getter function to return if the instance of an animal
-     // * is female or not.
-     // */
-    // private boolean getIsFemale()
-    // {
-        // return isFemale;
-    // }
 }

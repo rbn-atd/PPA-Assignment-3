@@ -12,7 +12,8 @@ import java.util.Map;
  * setColor method.
  * 
  * @author David J. Barnes and Michael Kölling
- * @version 2016.02.29
+ *          with Reuben Atendido and Oliver Macpherson
+ * @version 2022.02.17
  */
 public class SimulatorView extends JFrame
 {
@@ -74,13 +75,13 @@ public class SimulatorView extends JFrame
     }
     
     /**
-     * Define a color to be used for a given class of animal.
-     * @param animalClass The animal's Class object.
+     * Define a color to be used for a given class of species.
+     * @param speciesClass The species's Class object.
      * @param color The color to be used for the given class.
      */
-    public void setColor(Class animalClass, Color color)
+    public void setColor(Class speciesClass, Color color)
     {
-        colors.put(animalClass, color);
+        colors.put(speciesClass, color);
     }
 
     /**
@@ -92,11 +93,11 @@ public class SimulatorView extends JFrame
     }
 
     /**
-     * @return The color to be used for a given class of animal.
+     * @return The color to be used for a given class of species.
      */
-    private Color getColor(Class animalClass)
+    private Color getColor(Class speciesClass)
     {
-        Color col = colors.get(animalClass);
+        Color col = colors.get(speciesClass);
         if(col == null) {
             // no color defined for this class
             return UNKNOWN_COLOR;
@@ -126,13 +127,13 @@ public class SimulatorView extends JFrame
 
         for(int row = 0; row < field.getDepth(); row++) {
             for(int col = 0; col < field.getWidth(); col++) {
-                Object animal = field.getObjectAt(row, col);
-                 if(animal != null) {
-                    if(animal instanceof Animal) {
-                        stats.incrementCount(animal.getClass());
-                        fieldView.drawMark(col, row, getColor(animal.getClass()));
+                Object species = field.getObjectAt(row, col);
+                 if(species != null) {
+                    if(species instanceof Species) {
+                        stats.incrementCount(species.getClass());
+                        fieldView.drawMark(col, row, getColor(species.getClass()));
                     }
-                    else if(animal instanceof BiomeFeature) {
+                    else if(species instanceof BiomeFeature) {
                         fieldView.drawMark(col, row, Color.CYAN);
                     }
                 }

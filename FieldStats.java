@@ -21,7 +21,7 @@ public class FieldStats
      */
     public FieldStats()
     {
-        // Set up a collection for counters for each type of animal that
+        // Set up a collection for counters for each type of species that
         // we might find
         counters = new HashMap<>();
         countsValid = true;
@@ -61,23 +61,23 @@ public class FieldStats
     }
 
     /**
-     * Increment the count for one class of animal.
-     * @param animalClass The class of animal to increment.
+     * Increment the count for one class of species.
+     * @param speciesClass The class of species to increment.
      */
-    public void incrementCount(Class animalClass)
+    public void incrementCount(Class speciesClass)
     {
-        Counter count = counters.get(animalClass);
+        Counter count = counters.get(speciesClass);
         if(count == null) {
             // We do not have a counter for this species yet.
             // Create one.
-            count = new Counter(animalClass.getName());
-            counters.put(animalClass, count);
+            count = new Counter(speciesClass.getName());
+            counters.put(speciesClass, count);
         }
         count.increment();
     }
 
     /**
-     * Indicate that an animal count has been completed.
+     * Indicate that an species count has been completed.
      */
     public void countFinished()
     {
@@ -106,8 +106,8 @@ public class FieldStats
     }
     
     /**
-     * Generate counts of the number of foxes and rabbits.
-     * These are not kept up to date as foxes and rabbits
+     * Generate counts of the number of all species.
+     * These are not kept up to date as species
      * are placed in the field, but only when a request
      * is made for the information.
      * @param field The field to generate the stats for.
@@ -117,9 +117,9 @@ public class FieldStats
         reset();
         for(int row = 0; row < field.getDepth(); row++) {
             for(int col = 0; col < field.getWidth(); col++) {
-                Object animal = field.getObjectAt(row, col);
-                if(animal != null) {
-                    incrementCount(animal.getClass());
+                Object species = field.getObjectAt(row, col);
+                if(species != null) {
+                    incrementCount(species.getClass());
                 }
             }
         }

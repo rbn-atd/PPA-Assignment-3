@@ -5,11 +5,13 @@ import java.util.Random;
 /**
  * A simple model of an eagle.
  * eagles age, move, eat rabbits, and die.
+ * Basically flying foxes, they compete with foxes to eat rabbits
+ * whilst also eating radishes to make up for a lower breeding rate.
  * 
- * @author Reuben Atendido
- * @version 2016.02.29 (2)
+ * @author Reuben Atendido and Oliver Macpherson
+ * @version 1
  */
-public class Eagle extends Animal
+public class Eagle extends Species
 {
     // Characteristics shared by all eagles (class variables).
     
@@ -23,23 +25,22 @@ public class Eagle extends Animal
     private static final double FEMALE_PROBABILITY = 0.5;
     // The maximum number of births.
     private static final int MAX_LITTER_SIZE = 5 ;
-    // The food value of a single rabbit. In effect, this is the
+    // The food value of a single rabbit or radish. In effect, this is the
     // number of steps an eagle can go before it has to eat again.
     private static final int RABBIT_FOOD_VALUE = 20;
     
     private static final int RADISH_FOOD_VALUE = 12;
     // A shared random number generator to control breeding.
     private static final Random rand = Randomizer.getRandom();
-    //boolean flag to determine if this animal is nocturnal or not
-    //Determines what time of day this animal can move.
+    //boolean flag to determine if this species is nocturnal or not
+    //This species is not nocturnal.
     private static final boolean isNocturnal = false;
-    
     // Individual characteristics (instance fields).
     // The eagles's age.
     private int age;
     // The eagles's food level, which is increased by eating rabbits.
     private int foodLevel;
-    // The eagle's gender, male or female, which is randomly assigned at birth.
+    // The eagle's sex, male or female, which is randomly assigned at birth.
     private boolean isFemale;
 
     /**
@@ -49,7 +50,7 @@ public class Eagle extends Animal
      * @param randomAge If true, the eagle will have random age and hunger level.
      * @param field The field currently occupied.
      * @param location The location within the field.
-     * @param isNocturnal The flag indicating what time of day this animal moves.
+     * @param isNocturnal The flag indicating what time of day this species moves.
      * @param isFemale The flag indicating if the instance of an eagle is female.
      */
     public Eagle(boolean randomAge, Field field, Location location, boolean isFemale)
@@ -73,7 +74,7 @@ public class Eagle extends Animal
      * @param field The field currently occupied.
      * @param newEagles A list to return newly born eagles.
      */
-    public void act(List<Animal> newEagles)
+    public void act(List<Species> newEagles)
     {
         incrementAge();
         incrementHunger();
@@ -121,7 +122,7 @@ public class Eagle extends Animal
     /**
      * Look for rabbits adjacent to the current location.
      * The method has been modified to allow eagles to eat
-     * every adjacent rabbit found.
+     * every adjacent rabbit or radish found.
      * @return The last location where a rabbit was found.
      */
     private Location findFood()
@@ -132,23 +133,23 @@ public class Eagle extends Animal
         Location foodLocation = null;
         while(it.hasNext()) {
             Location where = it.next();
-            Object animal = field.getObjectAt(where);
-            if(animal instanceof Rabbit) {
-                Rabbit rabbit = (Rabbit) animal;
+            Object species = field.getObjectAt(where);
+            if(species instanceof Rabbit) {
+                Rabbit rabbit = (Rabbit) species;
                 if(rabbit.isAlive()) { 
                     rabbit.setDead();
                     foodLevel = RABBIT_FOOD_VALUE;
                     foodLocation = where;
                 }
             }
-            // else if(animal instanceof Radish) {
-                // Radish radish = (Radish) animal;
-                // if(radish.isAlive()) { 
-                    // radish.setDead();
-                    // foodLevel = RADISH_FOOD_VALUE;
-                    // foodLocation = where;
-                // }
-            // }
+            else if(species instanceof Radish) {
+                Radish radish = (Radish) species;
+                if(radish.isAlive()) { 
+                    radish.setDead();
+                    foodLevel = RADISH_FOOD_VALUE;
+                    foodLocation = where;
+                }
+            }
         }
         return foodLocation;
     }
@@ -158,7 +159,7 @@ public class Eagle extends Animal
      * New births will be made into free adjacent locations.
      * @param newEagles A list to return newly born eagles.
      */
-    private void giveBirth(List<Animal> newEagles)
+    private void giveBirth(List<Species> newEagles)
     {
         // New eagles are born into adjacent locations.
         // Get a list of adjacent free locations.
@@ -186,9 +187,9 @@ public class Eagle extends Animal
             Iterator<Location> it = adjacent.iterator();
             while(it.hasNext()) {
                 Location where = it.next();
-                Object animal = field.getObjectAt(where);
-                if (animal instanceof Eagle){
-                    Eagle eagle = (Eagle) animal;
+                Object species = field.getObjectAt(where);
+                if (species instanceof Eagle){
+                    Eagle eagle = (Eagle) species;
                     if(eagle.getIsFemale() != getIsFemale()){
                         births = rand.nextInt(MAX_LITTER_SIZE) + 1;
                     }

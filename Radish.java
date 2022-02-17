@@ -4,18 +4,20 @@ import java.util.Random;
 /**
  * Simple model of a radish.
  * Radishes age, spread (breed) and die.
+ * Feeding the vegetarian populations, with a relatively high spreading rate
+ * and extremely short life span.
  *
- * @author Reuben Atendido
- * @version (a version number or a date)
+ * @author Reuben Atendido and Oliver Macpherson
+ * @version 1
  */
-public class Radish extends Animal
+public class Radish extends Species
 {
      // Characteristics shared by all radishes (class variables).
 
     // The age to which a radish can live.
     private static final int MAX_AGE = 2;
     // The likelihood of a radish spreading.
-    private static final double BREEDING_PROBABILITY = 0.2;
+    private static final double BREEDING_PROBABILITY = 0.4;
     // The maximum number of plantings.
     private static final int MAX_LITTER_SIZE = 100;
     // A shared random number generator to control breeding.
@@ -27,10 +29,10 @@ public class Radish extends Animal
     private int age;
 
     /**
-     * Create a new radish. A rabbit may be created with age
+     * Create a new radish. A radish may be created with age
      * zero (a new born) or with a random age.
      * 
-     * @param randomAge If true, the rabbit will have a random age.
+     * @param randomAge If true, the radish will have a random age.
      * @param field The field currently occupied.
      * @param location The location within the field.
      */
@@ -48,7 +50,7 @@ public class Radish extends Animal
      * Sometimes it will spread or die of old age.
      * @param newRadishes A list to return newly planted radishes.
      */
-    public void act(List<Animal> newRadishes)
+    public void act(List<Species> newRadishes)
     {
         incrementAge();
         if(isAlive()){
@@ -71,9 +73,9 @@ public class Radish extends Animal
     /**
      * Check whether or not this radish is to spread at this step.
      * Newly spread plants will be made into free adjacent locations.
-     * @param newRaadishes A list to return newly born radishes.
+     * @param newRadishes A list to return newly born radishes.
      */
-    private void giveBirth(List<Animal> newRadishes)
+    private void giveBirth(List<Species> newRadishes)
     {
         Field field = getField();
         List<Location> free = field.getFreeAdjacentLocations(getLocation());
