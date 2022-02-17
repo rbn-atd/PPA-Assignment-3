@@ -5,19 +5,22 @@ import java.util.Iterator;
 /**
  * A simple model of a bear.
  * Bears age, move, eats rabbits and foxes, and die.
+ * They live moderately long lives and are benefitted by
+ * being able to eat the widest range of species on the grid
  *
  * @author Oliver Macpherson
  * @version 1.0
  */
-public class Bear extends Animal
+public class Bear extends Species
 {
     // instance variables - replace the example below with your own
     private static final int BREEDING_AGE = 10;
     private static final int MAX_AGE = 300;
-    private static final double BREEDING_PROBABILITY = 0.065;
+    private static final double BREEDING_PROBABILITY = 0.09;
     private static final double FEMALE_PROBABILITY = 0.5;
     private static final int MAX_LITTER_SIZE = 4;
     private static final int RABBIT_FOOD_VALUE = 15;
+    private static final int RACCOON_FOOD_VALUE = 17;
     private static final int PIG_FOOD_VALUE = 25;
     private static final int FOX_FOOD_VALUE = 20;
     private static final double DISEASE_PROBABILITY = 0.7;
@@ -31,7 +34,8 @@ public class Bear extends Animal
     private boolean isFemale;
     
     private int hungerLoss;
-
+    
+    private Weather weather;
     /**
      * Constructor for objects of class Bear
      */
@@ -40,6 +44,7 @@ public class Bear extends Animal
         super(field, location, isNocturnal, isFemale);
         this.isFemale = isFemale;
         this.hungerLoss = 1;
+        //weather = new Weather();
         if(randomAge) {
             age = rand.nextInt(MAX_AGE);
             foodLevel = rand.nextInt((FOX_FOOD_VALUE+FOX_FOOD_VALUE)/2);
@@ -89,11 +94,12 @@ public class Bear extends Animal
      * @param field The current field of the bear
      * @param newBears List to return newly born bears
      */
-    public void act(List<Animal> newBears)
+    public void act(List<Species> newBears)
     {   
         //hibernationCheck();
         incrementAge();
         incrementHunger();
+    
         if(isAlive()) {
             giveBirth(newBears);            
             // Move towards a source of food if found.
@@ -111,6 +117,7 @@ public class Bear extends Animal
                 setDead();
             }
         }
+       
     }
     
     /**
@@ -135,9 +142,9 @@ public class Bear extends Animal
             Iterator<Location> it = adjacent.iterator();
             while(it.hasNext()) {
                 Location where = it.next();
-                Object animal = field.getObjectAt(where);
-                if (animal instanceof Bear){
-                    Bear bear = (Bear) animal;
+                Object species = field.getObjectAt(where);
+                if (species instanceof Bear){
+                    Bear bear = (Bear) species;
                     if(bear.getIsFemale() != getIsFemale()){
                         births = rand.nextInt(MAX_LITTER_SIZE) + 1;
                     }
@@ -152,7 +159,7 @@ public class Bear extends Animal
      * New births will be made into free adjacent locations.
      * @param newBears A list to return newly born bears.
      */
-    private void giveBirth(List<Animal> newBears)
+    private void giveBirth(List<Species> newBears)
     {
         Field field = getField();
         List<Location> free = field.getFreeAdjacentLocations(getLocation());
@@ -166,8 +173,8 @@ public class Bear extends Animal
     
     /**
      * Look for rabbits and foxes adjacent to the current location.
-     * Only the first live rabbit or fox is eaten.
-     * @return Where food was found, or null if it wasn't.
+     * Modified to eat every adjacent species found
+     * @return Where food was found
      */
     private Location findFood()
     {
@@ -177,9 +184,9 @@ public class Bear extends Animal
         Location foodLocation = null;
         while(it.hasNext()) {
             Location where = it.next();
-            Object animal = field.getObjectAt(where);
-            if(animal instanceof Rabbit) {
-                Rabbit rabbit = (Rabbit) animal;
+            Object species = field.getObjectAt(where);
+            if(species instanceof Rabbit) {
+                Rabbit rabbit = (Rabbit) species;
                 if(rabbit.isAlive()) { 
                     rabbit.setDead();
                     foodLevel = RABBIT_FOOD_VALUE;
@@ -191,32 +198,31 @@ public class Bear extends Animal
                     return where;
                 }
             }
-            else if(animal instanceof Fox) {
-                Fox fox = (Fox) animal;
+            else if(species instanceof Fox) {
+                Fox fox = (Fox) species;
                 if(fox.isAlive()) {
                     fox.setDead();
                     foodLevel = FOX_FOOD_VALUE;
                     foodLocation = where;
-                    // if(fox.getIsDiseased() && rand.nextDouble() <= DISEASE_PROBABILITY){
-                        // toggleIsDiseased();
-                        // diseaseEffect();
-                        // System.out.println("Bear diseased");
-                    // }
                 }
             }    
-            else if(animal instanceof Pig) {
-                Pig pig = (Pig) animal;
+            else if(species instanceof Pig) {
+                Pig pig = (Pig) species;
                 if(pig.isAlive()) {
                     pig.setDead();
                     foodLevel = PIG_FOOD_VALUE;
                     foodLocation = where;
                 }
             }   
+            else if (species instanceof Raccoon) {
+                Raccoon raccoon = (Raccoon) species;
+                if(raccoon.isAlive()) {
+                    raccoon.setDead();
+                    foodLevel = RACCOON_FOOD_VALUE;
+                    foodLocation = where;
+                }
+            }
         }
         return foodLocation;
     }
-    
-    // private void hibernationCheck(){
-        
-    // }
 }
