@@ -38,7 +38,7 @@ public class Radish extends Species
      */
     public Radish(boolean randomAge, Field field, Location location)
     {
-        super(field, location, false, false);
+        super(field, location, false);
         age = 0;
         if(randomAge) {
             age = rand.nextInt(MAX_AGE);

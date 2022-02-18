@@ -53,9 +53,9 @@ public class Fox extends Species
      * @param field The field currently occupied.
      * @param location The location within the field.
      */
-    public Fox(boolean randomAge, Field field, Location location, boolean isFemale)
+    public Fox(boolean randomAge, Field field, Location location)
     {
-        super(field, location, isNocturnal, isFemale);
+        super(field, location, isNocturnal);
         this.isFemale = isFemale;
         this.hungerLoss = 1;
         if(randomAge) {
@@ -177,11 +177,11 @@ public class Fox extends Species
         for(int b = 0; b < births && free.size() > 0; b++) {
             Location loc = free.remove(0);
             if(rand.nextDouble() <= FEMALE_PROBABILITY){
-                     Fox young = new Fox(true, field, loc, true);
+                     Fox young = new Fox(true, field, loc);
                      newFoxes.add(young);
             }
             else{
-                     Fox young = new Fox(true, field, loc, false);
+                     Fox young = new Fox(true, field, loc);
                      newFoxes.add(young);
             }
         }
@@ -197,19 +197,7 @@ public class Fox extends Species
     {
         int births = 0;
         if(canBreed() && rand.nextDouble() <= BREEDING_PROBABILITY) {
-            Field field = getField();
-            List<Location> adjacent = field.adjacentLocations(getLocation());
-            Iterator<Location> it = adjacent.iterator();
-            while(it.hasNext()) {
-                Location where = it.next();
-                Object species = field.getObjectAt(where);
-                if (species instanceof Fox){
-                    Fox fox = (Fox) species;
-                    if(fox.getIsFemale() != getIsFemale()){
-                        births = rand.nextInt(MAX_LITTER_SIZE) + 1;
-                    }
-                }
-            }
+            births = rand.nextInt(MAX_LITTER_SIZE) + 1;
         }
         return births;
     }
@@ -219,6 +207,27 @@ public class Fox extends Species
      */
     private boolean canBreed()
     {
-        return age >= BREEDING_AGE;
+        return age >= BREEDING_AGE && hasMate();
+    }
+    
+    /**
+     * Checks whether animal has a mate available
+     */
+    private boolean hasMate()
+    {
+        Field field = getField();
+        List<Location> adjacent = field.adjacentLocations(getLocation());
+        Iterator<Location> it = adjacent.iterator();
+        while(it.hasNext()) {
+            Location where = it.next();
+            Object animal = field.getObjectAt(where);
+            if(animal instanceof Fox) {
+                Fox fox = (Fox) animal;
+                if(fox.gender()!=this.gender()) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }

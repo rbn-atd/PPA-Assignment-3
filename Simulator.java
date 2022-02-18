@@ -45,7 +45,10 @@ public class Simulator
     private static final double SNOW_PROBABILITY = 0.01;
     //probabilty the weather will be set to sunny
     private static final double SUN_PROBABILITY = 0.75;
-
+    
+    private static final double DEFAULT_RIVER_START = 0.6;
+    
+    private static final double DEFAULT_RIVER_END = 0.6;
     // List of species in the field.
     private List<Species> species;
     // List of infected/diseased species in the field.
@@ -130,7 +133,7 @@ public class Simulator
     {
         for(int step = 1; step <= numSteps && view.isViable(field); step++) {
             simulateOneStep();
-            delay(500);   // uncomment this to run more slowly
+            //delay(500);   // uncomment this to run more slowly
         }
     }
     
@@ -168,16 +171,21 @@ public class Simulator
             Species species = it.next();
             //species do not act if it is both snowing and raining, and only act in their respective times of day
             if ((!weather.getSnow() || !weather.getRain()) && ( (species.getIsNocturnal() && !time.getIsDay()) || (!species.getIsNocturnal() && time.getIsDay())  )) {
-                    species.act(newSpecies);
-                }
+                species.act(newSpecies);
+            }
             if(!species.isAlive()) {
-                    it.remove();
-                }
+                it.remove();
+            }
         }       
         // Add the newly born foxes and rabbits to the main lists.
         species.addAll(newSpecies);
         
         view.showStatus(step, time.getTimeOfDay(), weather.getWeather(), field);
+        
+        if(step<200) {
+            generateRiver(DEFAULT_RIVER_START, DEFAULT_RIVER_END);
+            generateRiver(0.2, 0.2);
+        }
     }
             
     /**
@@ -188,7 +196,8 @@ public class Simulator
         step = 0;
         species.clear();
         populate();
-        generateRiver(0.5, 0.6);
+        generateRiver(DEFAULT_RIVER_START, DEFAULT_RIVER_END);
+        generateRiver(0.2, 0.2);
         // Show the starting state in the view.
         view.showStatus(step, time.getTimeOfDay(), weather.getWeather(), field);
     }
@@ -205,79 +214,58 @@ public class Simulator
         for(int row = 0; row < field.getDepth(); row++) {
             for(int col = 0; col < field.getWidth(); col++) {
                 if(rand.nextDouble() <= FOX_CREATION_PROBABILITY) {
-                   Location location = new Location(row, col);
-                   if(rand.nextDouble() <= FEMALE_CREATION_PROBABILITY){
-                        Fox fox = new Fox(true, field, location, true);
-                        species.add(fox);
-                    }
-                    else{
-                        Fox fox = new Fox(true, field, location, false);
-                        species.add(fox);
-                    }
+                    if(riverCheck(row, col)) {break;}
+                    Location location = new Location(row, col);
+                    Fox fox = new Fox(true, field, location);
+                    species.add(fox);
                 }
                 else if(rand.nextDouble() <= RABBIT_CREATION_PROBABILITY) {
+                    if(riverCheck(row, col)) {break;}
                     Location location = new Location(row, col);
-                    if(rand.nextDouble() <= FEMALE_CREATION_PROBABILITY){
-                        Rabbit rabbit = new Rabbit(true, field, location, true);
-                        species.add(rabbit);
-                    }
-                    else{
-                        Rabbit rabbit = new Rabbit(true, field, location, false);
-                        species.add(rabbit);
-                    }
+                    Rabbit rabbit = new Rabbit(true, field, location);
+                    species.add(rabbit);
                 }
-                else if(rand.nextDouble() <= EAGLE_CREATION_PROBABILITY) { 
+                else if(rand.nextDouble() <= EAGLE_CREATION_PROBABILITY) {
+                    if(riverCheck(row, col)) {break;}
                     Location location = new Location(row, col);
-                    if(rand.nextDouble() <= FEMALE_CREATION_PROBABILITY){
-                        Eagle eagle = new Eagle(true, field, location, true);
-                        species.add(eagle);
-                    }
-                    else{
-                        Eagle eagle = new Eagle(true, field, location, false);
-                        species.add(eagle);
-                    }
+                    Eagle eagle = new Eagle(true, field, location);
+                    species.add(eagle);
                 }
                 else if(rand.nextDouble() <= RADISH_CREATION_PROBABILITY) { 
+                    if(riverCheck(row, col)) {break;}
                     Location location = new Location(row, col);
                     Radish radish = new Radish(true, field, location);
                     species.add(radish);
                 }
                 else if(rand.nextDouble() <= PIG_CREATION_PROBABILITY) {
-                   Location location = new Location(row, col);
-                   if(rand.nextDouble() <= FEMALE_CREATION_PROBABILITY){
-                       Pig pig = new Pig(true, field, location, true);
-                       species.add(pig);
-                    }
-                   else{
-                        Pig pig = new Pig(true, field, location, false);
-                        species.add(pig);
-                    }
+                    if(riverCheck(row, col)) {break;}
+                    Location location = new Location(row, col);
+                    Pig pig = new Pig(true, field, location);
+                    species.add(pig);
                 }
                 else if(rand.nextDouble() <= BEAR_CREATION_PROBABILITY) {
+                    if(riverCheck(row, col)) {break;}
                     Location location = new Location(row, col);
-                    if(rand.nextDouble() <= FEMALE_CREATION_PROBABILITY){
-                        Bear bear = new Bear(true, field, location, true);
-                        species.add(bear);
-                    }
-                    else{
-                        Bear bear = new Bear(true, field, location, false);
-                        species.add(bear);
-                    }
+                    Bear bear = new Bear(true, field, location);
+                    species.add(bear);
                 }
                 else if(rand.nextDouble() <= RACCOON_CREATION_PROBABILITY) {
+                    if(riverCheck(row, col)) {break;}
                     Location location = new Location(row, col);
-                    if(rand.nextDouble() <= FEMALE_CREATION_PROBABILITY){
-                        Raccoon raccoon = new Raccoon(true, field, location, true);
-                        species.add(raccoon);
-                    }
-                    else{
-                        Raccoon raccoon = new Raccoon(true, field, location, false);
-                        species.add(raccoon);
-                    }
+                    Raccoon raccoon = new Raccoon(true, field, location);
+                    species.add(raccoon);
                 }
                 // else leave the location empty.
             }
         }
+    }
+    
+    private boolean riverCheck(int row, int column)
+    {
+        if(field.getObjectAt(row, column) instanceof River) {
+            return true;
+        }
+        return false;
     }
     
     /**
@@ -303,20 +291,46 @@ public class Simulator
     private void generateRiver(double bottomStartFraction, double topStartFraction) {
         int tempWidth = field.getWidth();
         int tempDepth = field.getDepth();
-        int riverWidth = (tempWidth/10)*3;
-        Location start = new Location(tempDepth-1, (int) bottomStartFraction*tempWidth);
+        int riverWidth = (int) (tempWidth/25);
+        Location start = new Location(tempDepth-1, (int) (bottomStartFraction*tempWidth));
         River riverStart = new River(field, start);
         features.add(riverStart);
-        Location end = new Location(0, (int) topStartFraction*tempWidth);
+        Location end = new Location(0, (int) (topStartFraction*tempWidth));
         River riverEnd = new River(field, end);
         features.add(riverStart);
-        int gradient = (tempDepth/(int) (((int) topStartFraction*tempWidth)-(bottomStartFraction*tempWidth)));
-        for(int i = 1; i < tempDepth-1; i++) {
-            for(int j = 1; i < tempDepth-1; i++) {
-                Location location = new Location(i, j);
-                River river = new River(field, location);
-                features.add(river);
+        double gradient;
+        if(topStartFraction!=bottomStartFraction) {
+            gradient = (tempDepth/ (( ((topStartFraction*tempWidth)-(bottomStartFraction*tempWidth)))));
+        }
+        else {
+            for(int i = 0; i < tempDepth; i++) {
+                for(int j = 0; j <= riverWidth; j++) {
+                    for(int k = 0; k <= riverWidth; k++) {
+                        Location location = new Location(i, ((int) (topStartFraction*tempWidth))+j);
+                        River river = new River(field, location);
+                        features.add(river);
+                    }
+                }
+            }
+            return;
+        }
+        
+        
+        for(int i = 0; i < tempDepth; i++) {
+            for(int j = start.getCol(); j <(end.getCol()); j++) {
+                int x = j-start.getCol();
+                
+                if(i == gradient*x) {
+                    for(int k = 0; k <= riverWidth; k++) {
+                        if(j+k < tempWidth) {
+                            Location location = new Location(i, j+k);
+                            River river = new River(field, location);
+                            features.add(river);
+                        }
+                    }
+                }
             }
         }
     }
 }
+

@@ -49,9 +49,9 @@ public class Rabbit extends Species
      * @param field The field currently occupied.
      * @param location The location within the field.
      */
-    public Rabbit(boolean randomAge, Field field, Location location, boolean isFemale)//, boolean isDiseased)
+    public Rabbit(boolean randomAge, Field field, Location location)//, boolean isDiseased)
     {
-        super(field, location, isNocturnal, isFemale);//, isDiseased);
+        super(field, location, isNocturnal);//, isDiseased);
         age = 0;
         this.isFemale = isFemale;
         //this.isDiseased = isDiseased;
@@ -117,11 +117,11 @@ public class Rabbit extends Species
             Location loc = free.remove(0);
             //Rabbit young = new Rabbit(false, field, loc, isFemale);
             if(rand.nextDouble() <= FEMALE_PROBABILITY){
-                     Rabbit young = new Rabbit(true, field, loc, true);
+                     Rabbit young = new Rabbit(true, field, loc);
                      newRabbits.add(young);
             }
             else{
-                     Rabbit young = new Rabbit(true, field, loc, false);
+                     Rabbit young = new Rabbit(true, field, loc);
                      newRabbits.add(young);
             }
             //newRabbits.add(young);
@@ -139,19 +139,7 @@ public class Rabbit extends Species
     {
         int births = 0;
         if(canBreed() && rand.nextDouble() <= BREEDING_PROBABILITY) {
-            Field field = getField();
-            List<Location> adjacent = field.adjacentLocations(getLocation());
-            Iterator<Location> it = adjacent.iterator();
-            while(it.hasNext()) {
-                Location where = it.next();
-                Object species = field.getObjectAt(where);
-                if (species instanceof Rabbit){
-                    Rabbit rabbit = (Rabbit) species;
-                    if(rabbit.getIsFemale() != getIsFemale()){
-                        births = rand.nextInt(MAX_LITTER_SIZE) + 1;
-                    }
-                }
-            }
+            births = rand.nextInt(MAX_LITTER_SIZE) + 1;
         }
         return births;
     }
@@ -162,6 +150,27 @@ public class Rabbit extends Species
      */
     private boolean canBreed()
     {
-        return age >= BREEDING_AGE;
+        return age >= BREEDING_AGE && hasMate();
+    }
+    
+    /**
+     * Checks whether animal has a mate available
+     */
+    private boolean hasMate()
+    {
+        Field field = getField();
+        List<Location> adjacent = field.adjacentLocations(getLocation());
+        Iterator<Location> it = adjacent.iterator();
+        while(it.hasNext()) {
+            Location where = it.next();
+            Object animal = field.getObjectAt(where);
+            if(animal instanceof Rabbit) {
+                Rabbit rabbit = (Rabbit) animal;
+                if(rabbit.gender()!=this.gender()) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }

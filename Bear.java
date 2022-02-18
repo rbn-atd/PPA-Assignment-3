@@ -39,9 +39,9 @@ public class Bear extends Species
     /**
      * Constructor for objects of class Bear
      */
-    public Bear(boolean randomAge, Field field, Location location, boolean isFemale)
+    public Bear(boolean randomAge, Field field, Location location)
     {
-        super(field, location, isNocturnal, isFemale);
+        super(field, location, isNocturnal);
         this.isFemale = isFemale;
         this.hungerLoss = 1;
         //weather = new Weather();
@@ -121,11 +121,32 @@ public class Bear extends Species
     }
     
     /**
+     * Checks whether animal has a mate available
+     */
+    private boolean hasMate()
+    {
+        Field field = getField();
+        List<Location> adjacent = field.adjacentLocations(getLocation());
+        Iterator<Location> it = adjacent.iterator();
+        while(it.hasNext()) {
+            Location where = it.next();
+            Object animal = field.getObjectAt(where);
+            if(animal instanceof Bear) {
+                Bear bear = (Bear) animal;
+                if(bear.gender()!=this.gender()) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+    
+    /**
      * Method to determine whether a bear can breed
      */
     private boolean canBreed()
     {
-        return age >= BREEDING_AGE;
+        return age >= BREEDING_AGE && hasMate();
     }
     
     /**
@@ -137,19 +158,7 @@ public class Bear extends Species
     {
         int births = 0;
         if(canBreed() && rand.nextDouble() <= BREEDING_PROBABILITY) {
-            Field field = getField();
-            List<Location> adjacent = field.adjacentLocations(getLocation());
-            Iterator<Location> it = adjacent.iterator();
-            while(it.hasNext()) {
-                Location where = it.next();
-                Object species = field.getObjectAt(where);
-                if (species instanceof Bear){
-                    Bear bear = (Bear) species;
-                    if(bear.getIsFemale() != getIsFemale()){
-                        births = rand.nextInt(MAX_LITTER_SIZE) + 1;
-                    }
-                }
-            }
+            births = rand.nextInt(MAX_LITTER_SIZE) + 1;
         }
         return births;
     }
@@ -166,7 +175,7 @@ public class Bear extends Species
         int births = breed();
         for(int b = 0; b < births && free.size() > 0; b++) {
             Location loc = free.remove(0);
-            Bear young = new Bear(false, field, loc, isFemale);
+            Bear young = new Bear(false, field, loc);
             newBears.add(young);
         }
     }

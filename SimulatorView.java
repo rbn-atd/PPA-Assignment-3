@@ -29,9 +29,9 @@ public class SimulatorView extends JFrame
     private final String STEPBUTTON_LABEL = "Step";
     private final String WEATHERLABEL_PREFIX = "Weather: ";
     private JLabel stepLabel, population, infoLabel, dayLabel, weatherLabel;
-    private JButton stepButton;
+    
     private FieldView fieldView;
-    private Simulator sim;
+    //private Simulator sim;
     // A map for storing colors for participants in the simulation
     private Map<Class, Color> colors;
     // A statistics object computing and storing simulation information
@@ -53,7 +53,7 @@ public class SimulatorView extends JFrame
         population = new JLabel(POPULATION_PREFIX, JLabel.CENTER);
         dayLabel = new JLabel(DAYLABEL_PREFIX, JLabel.CENTER);
         weatherLabel = new JLabel(WEATHERLABEL_PREFIX, JLabel.CENTER);
-        stepButton = new JButton(STEPBUTTON_LABEL);
+        
         
         setLocation(100, 50);
         
@@ -66,7 +66,7 @@ public class SimulatorView extends JFrame
             infoPane.add(infoLabel, BorderLayout.CENTER);
             infoPane.add(dayLabel, BorderLayout.CENTER);
             infoPane.add(weatherLabel, BorderLayout.EAST);
-            infoPane.add(stepButton, BorderLayout.SOUTH);
+            
         contents.add(infoPane, BorderLayout.NORTH);
         contents.add(fieldView, BorderLayout.CENTER);
         contents.add(population, BorderLayout.SOUTH);
@@ -134,7 +134,7 @@ public class SimulatorView extends JFrame
                         fieldView.drawMark(col, row, getColor(species.getClass()));
                     }
                     else if(species instanceof BiomeFeature) {
-                        fieldView.drawMark(col, row, Color.CYAN);
+                        fieldView.drawMark(col, row, getColor(species.getClass()));
                     }
                 }
                 else {

@@ -53,9 +53,9 @@ public class Eagle extends Species
      * @param isNocturnal The flag indicating what time of day this species moves.
      * @param isFemale The flag indicating if the instance of an eagle is female.
      */
-    public Eagle(boolean randomAge, Field field, Location location, boolean isFemale)
+    public Eagle(boolean randomAge, Field field, Location location)
     {
-        super(field, location, isNocturnal, isFemale);
+        super(field, location, isNocturnal);
         this.isFemale = isFemale;
         if(randomAge) {
             age = rand.nextInt(MAX_AGE);
@@ -168,7 +168,7 @@ public class Eagle extends Species
         int births = breed();
         for(int b = 0; b < births && free.size() > 0; b++) {
             Location loc = free.remove(0);
-            Eagle young = new Eagle(false, field, loc, isFemale);
+            Eagle young = new Eagle(false, field, loc);
             newEagles.add(young);
         }
     }
@@ -182,19 +182,7 @@ public class Eagle extends Species
     {
         int births = 0;
         if(canBreed() && rand.nextDouble() <= BREEDING_PROBABILITY) {
-            Field field = getField();
-            List<Location> adjacent = field.adjacentLocations(getLocation());
-            Iterator<Location> it = adjacent.iterator();
-            while(it.hasNext()) {
-                Location where = it.next();
-                Object species = field.getObjectAt(where);
-                if (species instanceof Eagle){
-                    Eagle eagle = (Eagle) species;
-                    if(eagle.getIsFemale() != getIsFemale()){
-                        births = rand.nextInt(MAX_LITTER_SIZE) + 1;
-                    }
-                }
-            }
+            births = rand.nextInt(MAX_LITTER_SIZE) + 1;
         }
         return births;
     }
@@ -204,6 +192,27 @@ public class Eagle extends Species
      */
     private boolean canBreed()
     {
-        return age >= BREEDING_AGE;
+        return age >= BREEDING_AGE && hasMate();
+    }
+    
+    /**
+     * Checks whether animal has a mate available
+     */
+    private boolean hasMate()
+    {
+        Field field = getField();
+        List<Location> adjacent = field.adjacentLocations(getLocation());
+        Iterator<Location> it = adjacent.iterator();
+        while(it.hasNext()) {
+            Location where = it.next();
+            Object animal = field.getObjectAt(where);
+            if(animal instanceof Eagle) {
+                Eagle eagle = (Eagle) animal;
+                if(eagle.gender()!=this.gender()) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }

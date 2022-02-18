@@ -1,4 +1,5 @@
 import java.util.List;
+import java.util.Random;
 
 /**
  * A class representing shared characteristics of species.
@@ -18,7 +19,7 @@ public abstract class Species
     //Flag for if the specie is active at day or night.
     private boolean isNocturnal;
     //Flag for if the instance of a specie is female or not.
-    private boolean isFemale;
+    protected boolean isFemale;
     //Flag for if the instance of a specie is diseased or not.
     protected boolean isDiseased;
     /**
@@ -27,12 +28,18 @@ public abstract class Species
      * @param field The field currently occupied.
      * @param location The location within the field.
      */
-    public Species(Field field, Location location, boolean isNocturnal, boolean isFemale)//, boolean isDiseased)
+    public Species(Field field, Location location, boolean isNocturnal)//, boolean isDiseased)
     {
         alive = true;
         this.field = field;
         this.isNocturnal = isNocturnal;
-        this.isFemale = isFemale;
+        Random rand = Randomizer.getRandom();
+        if(rand.nextInt(2)==0) {
+            isFemale=true;
+        }
+        else {
+            isFemale=false;
+        }
         this.isDiseased = false;
         setLocation(location);
     }
@@ -109,7 +116,7 @@ public abstract class Species
      * return the specie's female truth value
      * given this is false then the instance is male.
      */
-    protected boolean getIsFemale()
+    protected boolean gender()
     {
         return isFemale;
     }

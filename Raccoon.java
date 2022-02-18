@@ -49,9 +49,9 @@ public class Raccoon extends Species
      * @param field The field currently occupied.
      * @param location The location within the field.
      */
-    public Raccoon(boolean randomAge, Field field, Location location, boolean isFemale)
+    public Raccoon(boolean randomAge, Field field, Location location)
     {
-        super(field, location, isNocturnal, isFemale);
+        super(field, location, isNocturnal);
         this.isFemale = isFemale;
         if(randomAge) {
             age = rand.nextInt(MAX_AGE);
@@ -130,11 +130,11 @@ public class Raccoon extends Species
         for(int b = 0; b < births && free.size() > 0; b++) {
             Location loc = free.remove(0);
             if(rand.nextDouble() <= FEMALE_PROBABILITY){
-                     Raccoon young = new Raccoon(true, field, loc, true);
+                     Raccoon young = new Raccoon(true, field, loc);
                      newRaccoons.add(young);
             }
             else{
-                     Raccoon young = new Raccoon(true, field, loc, false);
+                     Raccoon young = new Raccoon(true, field, loc);
                      newRaccoons.add(young);
             }
         }
@@ -176,19 +176,7 @@ public class Raccoon extends Species
     {
         int births = 0;
         if(canBreed() && rand.nextDouble() <= BREEDING_PROBABILITY) {
-            Field field = getField();
-            List<Location> adjacent = field.adjacentLocations(getLocation());
-            Iterator<Location> it = adjacent.iterator();
-            while(it.hasNext()) {
-                Location where = it.next();
-                Object species = field.getObjectAt(where);
-                if (species instanceof Raccoon){
-                    Raccoon raccoon = (Raccoon) species;
-                    if(raccoon.getIsFemale() != getIsFemale()){
-                        births = rand.nextInt(MAX_LITTER_SIZE) + 1;
-                    }
-                }
-            }
+            births = rand.nextInt(MAX_LITTER_SIZE) + 1;
         }
         return births;
     }
@@ -199,6 +187,27 @@ public class Raccoon extends Species
      */
     private boolean canBreed()
     {
-        return age >= BREEDING_AGE;
+        return age >= BREEDING_AGE &&hasMate();
+    }
+    
+    /**
+     * Checks whether animal has a mate available
+     */
+    private boolean hasMate()
+    {
+        Field field = getField();
+        List<Location> adjacent = field.adjacentLocations(getLocation());
+        Iterator<Location> it = adjacent.iterator();
+        while(it.hasNext()) {
+            Location where = it.next();
+            Object animal = field.getObjectAt(where);
+            if(animal instanceof Raccoon) {
+                Raccoon raccoon = (Raccoon) animal;
+                if(raccoon.gender()!=this.gender()) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }
