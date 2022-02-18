@@ -153,6 +153,7 @@ public class Fox extends Species
                     if(rabbit.getIsDiseased() && rand.nextDouble() <= DISEASE_PROBABILITY){
                         toggleIsDiseased();
                         diseaseEffect();
+                        
                         System.out.println("Fox diseased");
                     }
                 }
@@ -176,14 +177,8 @@ public class Fox extends Species
         int births = breed();
         for(int b = 0; b < births && free.size() > 0; b++) {
             Location loc = free.remove(0);
-            if(rand.nextDouble() <= FEMALE_PROBABILITY){
-                     Fox young = new Fox(true, field, loc);
-                     newFoxes.add(young);
-            }
-            else{
-                     Fox young = new Fox(true, field, loc);
-                     newFoxes.add(young);
-            }
+            Fox young = new Fox(true, field, loc);
+            newFoxes.add(young);
         }
     }
         

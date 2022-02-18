@@ -129,14 +129,9 @@ public class Raccoon extends Species
         int births = breed();
         for(int b = 0; b < births && free.size() > 0; b++) {
             Location loc = free.remove(0);
-            if(rand.nextDouble() <= FEMALE_PROBABILITY){
-                     Raccoon young = new Raccoon(true, field, loc);
-                     newRaccoons.add(young);
-            }
-            else{
-                     Raccoon young = new Raccoon(true, field, loc);
-                     newRaccoons.add(young);
-            }
+            
+            Raccoon young = new Raccoon(true, field, loc);
+            newRaccoons.add(young);
         }
     }
         

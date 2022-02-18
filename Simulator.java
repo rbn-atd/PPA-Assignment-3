@@ -46,9 +46,9 @@ public class Simulator
     //probabilty the weather will be set to sunny
     private static final double SUN_PROBABILITY = 0.75;
     
-    private static final double DEFAULT_RIVER_START = 0.6;
+    private static final double DEFAULT_RIVER_START = 0.2;
     
-    private static final double DEFAULT_RIVER_END = 0.6;
+    private static final double DEFAULT_RIVER_END = 0.8;
     // List of species in the field.
     private List<Species> species;
     // List of infected/diseased species in the field.
@@ -184,7 +184,6 @@ public class Simulator
         
         if(step<200) {
             generateRiver(DEFAULT_RIVER_START, DEFAULT_RIVER_END);
-            generateRiver(0.2, 0.2);
         }
     }
             
@@ -197,7 +196,7 @@ public class Simulator
         species.clear();
         populate();
         generateRiver(DEFAULT_RIVER_START, DEFAULT_RIVER_END);
-        generateRiver(0.2, 0.2);
+        
         // Show the starting state in the view.
         view.showStatus(step, time.getTimeOfDay(), weather.getWeather(), field);
     }
@@ -314,22 +313,39 @@ public class Simulator
             }
             return;
         }
-        
-        
-        for(int i = 0; i < tempDepth; i++) {
-            for(int j = start.getCol(); j <(end.getCol()); j++) {
-                int x = j-start.getCol();
-                
-                if(i == gradient*x) {
-                    for(int k = 0; k <= riverWidth; k++) {
-                        if(j+k < tempWidth) {
-                            Location location = new Location(i, j+k);
-                            River river = new River(field, location);
-                            features.add(river);
+        List<Integer> rowNos = new ArrayList<>();
+        int counter = 0;
+        int gap = 0;
+        while(counter<=1) {
+            for(int i = 0; i < tempDepth; i++) {
+                for(int j = start.getCol(); j <(end.getCol()); j++) {
+                    int x = j-start.getCol();
+                    if(rowNos.size()>=2) {
+                        gap = rowNos.get(1)-rowNos.get(0);
+                        
+                    }
+                    if(i == gradient*x) {
+                        for(int k = 0; k <= riverWidth; k++) {
+                            if(j+k < tempWidth) {
+                                if(field.getObjectAt(i, j+k) instanceof River) {
+                                    int totalCheck = 1;
+                                    while(totalCheck < gap) {
+                                        Location location = new Location(i+totalCheck, j+k);
+                                        River river = new River(field, location);
+                                        features.add(river);
+                                        totalCheck++;
+                                    }
+                                }
+                                Location location = new Location(i, j+k);
+                                River river = new River(field, location);
+                                features.add(river);
+                                rowNos.add(i);
+                            }
                         }
                     }
                 }
             }
+            counter++;
         }
     }
 }

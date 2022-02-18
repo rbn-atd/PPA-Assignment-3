@@ -116,14 +116,8 @@ public class Rabbit extends Species
         for(int b = 0; b < births && free.size() > 0; b++) {
             Location loc = free.remove(0);
             //Rabbit young = new Rabbit(false, field, loc, isFemale);
-            if(rand.nextDouble() <= FEMALE_PROBABILITY){
-                     Rabbit young = new Rabbit(true, field, loc);
-                     newRabbits.add(young);
-            }
-            else{
-                     Rabbit young = new Rabbit(true, field, loc);
-                     newRabbits.add(young);
-            }
+            Rabbit young = new Rabbit(true, field, loc);
+            newRabbits.add(young);
             //newRabbits.add(young);
         }
     }
