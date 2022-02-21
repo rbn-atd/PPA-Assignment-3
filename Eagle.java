@@ -4,12 +4,12 @@ import java.util.Random;
 
 /**
  * A simple model of an eagle.
- * eagles age, move, eat rabbits, and die.
- * Basically flying foxes, they compete with foxes to eat rabbits
+ * eagles age, move, eat rabbits, radishes, raccoons, and foxes, and die.
+ * Basically flying foxes, they compete with foxes to eat rabbits and others
  * whilst also eating radishes to make up for a lower breeding rate.
  * 
  * @author Reuben Atendido and Oliver Macpherson
- * @version 1
+ * @version 2022/02/21 (1)
  */
 public class Eagle extends Species
 {
@@ -20,16 +20,21 @@ public class Eagle extends Species
     // The age to which a eagle can live.
     private static final int MAX_AGE = 275;
     // The likelihood of a eagle breeding.
-    private static final double BREEDING_PROBABILITY = 0.09;
+    private static final double BREEDING_PROBABILITY = 0.03;
     
-    private static final double FEMALE_PROBABILITY = 0.5;
     // The maximum number of births.
-    private static final int MAX_LITTER_SIZE = 5 ;
-    // The food value of a single rabbit or radish. In effect, this is the
+    private static final int MAX_LITTER_SIZE = 4 ;
+    // The food value of a single rabbit. In effect, this is the
     // number of steps an eagle can go before it has to eat again.
     private static final int RABBIT_FOOD_VALUE = 20;
-    
+    //The food value of a single radish.
     private static final int RADISH_FOOD_VALUE = 12;
+    //The food value of a single raccoon
+    private static final int RACCOON_FOOD_VALUE = 20;
+    //The food value of a single fox.
+    private static final int FOX_FOOD_VALUE = 20;
+    //The maximum food eagle can consume before being "full"
+    private static final int MAX_HUNGER = 50;
     // A shared random number generator to control breeding.
     private static final Random rand = Randomizer.getRandom();
     //boolean flag to determine if this species is nocturnal or not
@@ -38,7 +43,7 @@ public class Eagle extends Species
     // Individual characteristics (instance fields).
     // The eagles's age.
     private int age;
-    // The eagles's food level, which is increased by eating rabbits.
+    // The eagles's food level, which is increased by eating.
     private int foodLevel;
     // The eagle's sex, male or female, which is randomly assigned at birth.
     private boolean isFemale;
@@ -59,11 +64,11 @@ public class Eagle extends Species
         this.isFemale = isFemale;
         if(randomAge) {
             age = rand.nextInt(MAX_AGE);
-            foodLevel = rand.nextInt(RABBIT_FOOD_VALUE);
+            foodLevel = rand.nextInt(RABBIT_FOOD_VALUE+RADISH_FOOD_VALUE+RACCOON_FOOD_VALUE+FOX_FOOD_VALUE/4);
         }
         else {
             age = 0;
-            foodLevel = RABBIT_FOOD_VALUE;
+            foodLevel = (RABBIT_FOOD_VALUE+RADISH_FOOD_VALUE+RACCOON_FOOD_VALUE+FOX_FOOD_VALUE/4);
         }
     }
     
@@ -138,7 +143,12 @@ public class Eagle extends Species
                 Rabbit rabbit = (Rabbit) species;
                 if(rabbit.isAlive()) { 
                     rabbit.setDead();
-                    foodLevel = RABBIT_FOOD_VALUE;
+                    if(foodLevel+RABBIT_FOOD_VALUE <= MAX_HUNGER) {
+                        foodLevel += RABBIT_FOOD_VALUE;
+                    }
+                    else {
+                        foodLevel = MAX_HUNGER;
+                    }
                     foodLocation = where;
                 }
             }
@@ -146,7 +156,38 @@ public class Eagle extends Species
                 Radish radish = (Radish) species;
                 if(radish.isAlive()) { 
                     radish.setDead();
-                    foodLevel = RADISH_FOOD_VALUE;
+                    if(foodLevel+RADISH_FOOD_VALUE <= MAX_HUNGER) {
+                        foodLevel += RADISH_FOOD_VALUE;
+                    }
+                    else {
+                        foodLevel = MAX_HUNGER;
+                    }
+                    foodLocation = where;
+                }
+            }
+            else if(species instanceof Raccoon) {
+                Raccoon raccoon = (Raccoon) species;
+                if(raccoon.isAlive()) { 
+                    raccoon.setDead();
+                    if(foodLevel+RACCOON_FOOD_VALUE <= MAX_HUNGER) {
+                        foodLevel += RACCOON_FOOD_VALUE;
+                    }
+                    else {
+                        foodLevel = MAX_HUNGER;
+                    }
+                    foodLocation = where;
+                }
+            }
+            else if(species instanceof Fox) {
+                Fox fox = (Fox) species;
+                if(fox.isAlive()) { 
+                    fox.setDead();
+                    if(foodLevel+FOX_FOOD_VALUE <= MAX_HUNGER) {
+                        foodLevel += FOX_FOOD_VALUE;
+                    }
+                    else {
+                        foodLevel = MAX_HUNGER;
+                    }
                     foodLocation = where;
                 }
             }
@@ -188,7 +229,7 @@ public class Eagle extends Species
     }
 
     /**
-     * An eagle can breed if it has reached the breeding age.
+     * An eagle can breed if it has reached the breeding age and has a mate.
      */
     private boolean canBreed()
     {

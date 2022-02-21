@@ -24,7 +24,7 @@ public abstract class Species
     protected boolean isDiseased;
     /**
      * Create a new species at location in field.
-     * 
+     * Randomly determines whether an instance is male of female.
      * @param field The field currently occupied.
      * @param location The location within the field.
      */

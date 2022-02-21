@@ -4,13 +4,13 @@ import java.util.Random;
 
 /**
  * A simple model of a fox.
- * Foxes age, move, eat rabbits and raccoons, and die.
+ * Foxes age, move, eat rabbits, pigs and eagles, and die.
  * Foxes are the most average of species, not having any outstanding
  * traits. They thrive off the abundance of rabbits, but are also probable to becoming
  * infected if eating a diseased rabbit.
  *  
- * @author David J. Barnes and Michael Kölling + Reuben Atendido
- * @version 2016.02.29 (2)
+ * @author David J. Barnes and Michael Kölling + Reuben Atendido and Oliver Macpherson
+ * @version 2022.02.21 (2)
  */
 public class Fox extends Species
 {
@@ -21,14 +21,18 @@ public class Fox extends Species
     // The age to which a fox can live.
     private static final int MAX_AGE = 275;
     // The likelihood of a fox breeding.
-    private static final double BREEDING_PROBABILITY = 0.13;
+    private static final double BREEDING_PROBABILITY = 0.15;
     // The maximum number of births.
     private static final int MAX_LITTER_SIZE = 4;
     // The food values of a single rabbit. In effect, this is the
     // number of steps a fox can go before it has to eat again.
-    private static final int RABBIT_FOOD_VALUE = 20;
-    //Probability this species is female
-    private static final double FEMALE_PROBABILITY = 0.5;
+    private static final int RABBIT_FOOD_VALUE = 25;
+    //The food value of a single pig.
+    private static final int PIG_FOOD_VALUE = 25;
+    //The food value of a single eagle
+    private static final int EAGLE_FOOD_VALUE = 20;
+    //The max a fox can eat before it is full
+    private static final int MAX_HUNGER = 70;
     //The probability a fox will become infected when eating an infected rabbit.
     private static final double DISEASE_PROBABILITY = 0.8;
     // A shared random number generator to control breeding.
@@ -38,11 +42,9 @@ public class Fox extends Species
     // Individual characteristics (instance fields).
     // The fox's age.
     private int age;
-    // The fox's food level, which is increased by eating rabbits.
+    // The fox's food level, which is increased by eating.
     private int foodLevel;
-    
-    private boolean isFemale;
-    
+    //How much hunger is lost per step
     private int hungerLoss;
     
     /**
@@ -60,11 +62,11 @@ public class Fox extends Species
         this.hungerLoss = 1;
         if(randomAge) {
             age = rand.nextInt(MAX_AGE);
-            foodLevel = rand.nextInt(RABBIT_FOOD_VALUE);
+            foodLevel = rand.nextInt(RABBIT_FOOD_VALUE+PIG_FOOD_VALUE+EAGLE_FOOD_VALUE/3);
         }
         else {
             age = 0;
-            foodLevel = RABBIT_FOOD_VALUE;
+            foodLevel = RABBIT_FOOD_VALUE+PIG_FOOD_VALUE+EAGLE_FOOD_VALUE/3;
         }
     }
     
@@ -148,7 +150,12 @@ public class Fox extends Species
                 Rabbit rabbit = (Rabbit) species;
                 if(rabbit.isAlive()) { 
                     rabbit.setDead();
-                    foodLevel = RABBIT_FOOD_VALUE;
+                    if(foodLevel+RABBIT_FOOD_VALUE <= MAX_HUNGER) {
+                        foodLevel += RABBIT_FOOD_VALUE;
+                    }
+                    else {
+                        foodLevel = MAX_HUNGER;
+                    }
                     foodLocation = where;
                     if(rabbit.getIsDiseased() && rand.nextDouble() <= DISEASE_PROBABILITY){
                         toggleIsDiseased();
@@ -156,6 +163,32 @@ public class Fox extends Species
                         
                         System.out.println("Fox diseased");
                     }
+                }
+            }
+            else if(species instanceof Pig) {
+                Pig pig = (Pig) species;
+                if(pig.isAlive()) { 
+                    pig.setDead();
+                    if(foodLevel+PIG_FOOD_VALUE <= MAX_HUNGER) {
+                        foodLevel += PIG_FOOD_VALUE;
+                    }
+                    else {
+                        foodLevel = MAX_HUNGER;
+                    }
+                    foodLocation = where;
+                }
+            }
+            else if(species instanceof Eagle) {
+                Eagle eagle = (Eagle) species;
+                if(eagle.isAlive()) { 
+                    eagle.setDead();
+                    if(foodLevel+EAGLE_FOOD_VALUE <= MAX_HUNGER) {
+                        foodLevel += EAGLE_FOOD_VALUE;
+                    }
+                    else {
+                        foodLevel = MAX_HUNGER;
+                    }
+                    foodLocation = where;
                 }
             }
         }
@@ -198,7 +231,7 @@ public class Fox extends Species
     }
 
     /**
-     * A fox can breed if it has reached the breeding age.
+     * A fox can breed if it has reached the breeding age and has a mate.
      */
     private boolean canBreed()
     {

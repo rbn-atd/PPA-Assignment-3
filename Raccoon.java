@@ -20,25 +20,23 @@ public class Raccoon extends Species
     // The age to which a raccoon can live.
     private static final int MAX_AGE = 200;
     // The likelihood of a raccoon breeding.
-    private static final double BREEDING_PROBABILITY = 0.135;
-    //The likelihood of a birth being female;
-    private static final double FEMALE_PROBABILITY = 0.5;
+    private static final double BREEDING_PROBABILITY = 0.18;
     // The maximum number of births.
     private static final int MAX_LITTER_SIZE = 6;
-    
+    //The food value gained by eating radishes
     private static final int RADISH_FOOD_VALUE = 20;
+    //The max a raccoon can eat before it is full
+    private static final int MAX_HUNGER = 80;
     // A shared random number generator to control breeding.
     private static final Random rand = Randomizer.getRandom();
-    //
+    //Flag for whether the animal is nocturnal
     private static final boolean isNocturnal = true;
     
     // Individual characteristics (instance fields).
     
     // The raccoon's age.
     private int age;
-    //The raccoon's gender
-    private boolean isFemale;
-    
+    //How many steps the raccoon can move before dying of hunger. Increased by eating
     private int foodLevel;
     
     /**
@@ -154,7 +152,12 @@ public class Raccoon extends Species
                 Radish radish = (Radish) species;
                 if(radish.isAlive()) { 
                     radish.setDead();
-                    foodLevel = RADISH_FOOD_VALUE;
+                    if(foodLevel+RADISH_FOOD_VALUE <= MAX_HUNGER) {
+                        foodLevel += RADISH_FOOD_VALUE;
+                    }
+                    else {
+                        foodLevel = MAX_HUNGER;
+                    }
                     radishLocation = where;
                 }
             }
@@ -177,8 +180,8 @@ public class Raccoon extends Species
     }
 
     /**
-     * A raccoon can breed if it has reached the breeding age.
-     * @return true if the rabbit can breed, false otherwise.
+     * A raccoon can breed if it has reached the breeding age and has a mate.
+     * @return true if the raccoon can breed, false otherwise.
      */
     private boolean canBreed()
     {

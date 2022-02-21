@@ -8,8 +8,12 @@
  */
 public class Time
 {
+    //boolean for whether is is daytime
     private boolean isDay = true;
-      
+    
+    /**
+     * Toggles between day and night
+     */
     public void toggleDayAndNight() {
         isDay = !isDay;
     }

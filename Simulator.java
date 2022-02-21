@@ -11,7 +11,7 @@ import java.awt.Color;
  * 
  * @author David J. Barnes and Michael Kölling
  *          with Reuben Atendido and Oliver Macpherson
- * @version 2022.02.17 (3)
+ * @version 2022.02.21 (4)
  */
 public class Simulator
 {   
@@ -29,13 +29,11 @@ public class Simulator
     // The probability that a radish will be created in any given grid position.
     private static final double RADISH_CREATION_PROBABILITY = 0.1;
     // The probability that a pig will be created in any given grid position.
-    private static final double PIG_CREATION_PROBABILITY = 0.087;
+    private static final double PIG_CREATION_PROBABILITY = 0.1;
     // The probability that a bear will be created in any given grid position.
     private static final double BEAR_CREATION_PROBABILITY = 0.05;
     // The probability that a raccoon will be created in any given grid position.
-    private static final double RACCOON_CREATION_PROBABILITY = 0.08;
-    //The probability that a female of any species will be created at any grid position
-    private static final double FEMALE_CREATION_PROBABILITY = 0.5;
+    private static final double RACCOON_CREATION_PROBABILITY = 0.1;
     //The probability a rabbit is already infected at creation
     //Only rabbits will have such probability, acting as a vector for the disease.
     private static final double DISEASE_CREATION_PROBABILITY = 0.7;
@@ -45,9 +43,11 @@ public class Simulator
     private static final double SNOW_PROBABILITY = 0.01;
     //probabilty the weather will be set to sunny
     private static final double SUN_PROBABILITY = 0.75;
-    
+    //boolean for whether a river will generate in the simulation
+    private static final boolean GENERATE_RIVER = false;
+    //the fraction along the bottom of the field where the river will start from
     private static final double DEFAULT_RIVER_START = 0.4;
-    
+    //the fraction along the top of the field where the river will end
     private static final double DEFAULT_RIVER_END = 0.6;
     // List of species in the field.
     private List<Species> species;
@@ -181,9 +181,10 @@ public class Simulator
         species.addAll(newSpecies);
         
         view.showStatus(step, time.getTimeOfDay(), weather.getWeather(), field);
-        
-        if(step<200) {
-            generateRiver(DEFAULT_RIVER_START, DEFAULT_RIVER_END);
+        if(GENERATE_RIVER) {
+            if(step<200) {
+                generateRiver(DEFAULT_RIVER_START, DEFAULT_RIVER_END);
+            }
         }
     }
             
@@ -195,15 +196,16 @@ public class Simulator
         step = 0;
         species.clear();
         populate();
-        generateRiver(DEFAULT_RIVER_START, DEFAULT_RIVER_END);
+        if(GENERATE_RIVER) {
+            generateRiver(DEFAULT_RIVER_START, DEFAULT_RIVER_END);
+        }
         
         // Show the starting state in the view.
         view.showStatus(step, time.getTimeOfDay(), weather.getWeather(), field);
     }
     
     /**
-     * Randomly populate the field with foxes and rabbits.
-     * This method has been modified to now consider a female probability
+     * Randomly populate the field with many different species.
      * Now species are created with a flag indicating if it is female
      */
     private void populate()
@@ -258,7 +260,9 @@ public class Simulator
             }
         }
     }
-    
+    /**
+     * Checks if a river is occupying a given location
+     */
     private boolean riverCheck(int row, int column)
     {
         if(field.getObjectAt(row, column) instanceof River) {
@@ -284,6 +288,7 @@ public class Simulator
     
     /**
      * Create a river
+     * Currently contains a variety of bugs
      * @param bottomStartFraction the fraction along the bottom where the river meets the edge
      * @param topStartFraction the fraction along the top where the river meets the edge
      */

@@ -4,35 +4,46 @@ import java.util.Iterator;
 
 /**
  * A simple model of a bear.
- * Bears age, move, eats rabbits and foxes, and die.
+ * Bears age, move, eats rabbits , foxes, raccoons, pigs, and radishes, and die.
  * They live moderately long lives and are benefitted by
  * being able to eat the widest range of species on the grid
  *
- * @author Oliver Macpherson
- * @version 1.0
+ * @author Oliver Macpherson and Reuben Atendido
+ * @version 2022/02/21 (2)
  */
 public class Bear extends Species
 {
-    // instance variables - replace the example below with your own
+    //The age at which the bear can breed
     private static final int BREEDING_AGE = 10;
+    //The max age which a bear can live to
     private static final int MAX_AGE = 300;
-    private static final double BREEDING_PROBABILITY = 0.09;
-    private static final double FEMALE_PROBABILITY = 0.5;
-    private static final int MAX_LITTER_SIZE = 4;
+    //The probability of a bear breeding
+    private static final double BREEDING_PROBABILITY = 0.04;
+    //The maximum size of a litter of bear cubs
+    private static final int MAX_LITTER_SIZE = 2;
+    //The food value gained by eating rabbits
     private static final int RABBIT_FOOD_VALUE = 15;
+    //The food value gained by eating raccoons
     private static final int RACCOON_FOOD_VALUE = 17;
+    //The food value gained by eating pigs
     private static final int PIG_FOOD_VALUE = 25;
+    //The food value gained by eating foxes
     private static final int FOX_FOOD_VALUE = 20;
+    //The food value gained by eating radishes
+    private static final int RADISH_FOOD_VALUE = 15;
+    //The max a bear can eat before being full
+    private static final int MAX_HUNGER = 100;
+    //The probability of a bear getting diseased
     private static final double DISEASE_PROBABILITY = 0.7;
+    //flag for whether bear is nocturnal
     private static final boolean isNocturnal = false;
+    //A shared random number generator to control breeding
     private static final Random rand = Randomizer.getRandom();
-    
+    //The age of the bear
     private int age;
-    
+    //The food level of the bear
     private int foodLevel;
-    
-    private boolean isFemale;
-    
+    //how much hunger the bear loses per step
     private int hungerLoss;
     
     private Weather weather;
@@ -47,11 +58,11 @@ public class Bear extends Species
         //weather = new Weather();
         if(randomAge) {
             age = rand.nextInt(MAX_AGE);
-            foodLevel = rand.nextInt((FOX_FOOD_VALUE+FOX_FOOD_VALUE)/2);
+            foodLevel = rand.nextInt((FOX_FOOD_VALUE+RADISH_FOOD_VALUE+PIG_FOOD_VALUE+RACCOON_FOOD_VALUE+RABBIT_FOOD_VALUE)/5);
         }
         else {
             age = 0;
-            foodLevel = (FOX_FOOD_VALUE+FOX_FOOD_VALUE)/2;
+            foodLevel = (FOX_FOOD_VALUE+RADISH_FOOD_VALUE+PIG_FOOD_VALUE+RACCOON_FOOD_VALUE+RABBIT_FOOD_VALUE)/5;
         }
     }
 
@@ -142,7 +153,8 @@ public class Bear extends Species
     }
     
     /**
-     * Method to determine whether a bear can breed
+     * Method to determine whether a bear can breed (ie if they are old enough and have a 
+     * mate.
      */
     private boolean canBreed()
     {
@@ -198,7 +210,13 @@ public class Bear extends Species
                 Rabbit rabbit = (Rabbit) species;
                 if(rabbit.isAlive()) { 
                     rabbit.setDead();
-                    foodLevel = RABBIT_FOOD_VALUE;
+                    if(foodLevel+RABBIT_FOOD_VALUE <= MAX_HUNGER) {
+                        foodLevel += RABBIT_FOOD_VALUE;
+                    }
+                    else {
+                        foodLevel = MAX_HUNGER;
+                    }
+                    
                     if(rabbit.getIsDiseased() && rand.nextDouble() <= DISEASE_PROBABILITY){
                         toggleIsDiseased();
                         diseaseEffect();
@@ -211,7 +229,12 @@ public class Bear extends Species
                 Fox fox = (Fox) species;
                 if(fox.isAlive()) {
                     fox.setDead();
-                    foodLevel = FOX_FOOD_VALUE;
+                    if(foodLevel+FOX_FOOD_VALUE <= MAX_HUNGER) {
+                        foodLevel += FOX_FOOD_VALUE;
+                    }
+                    else {
+                        foodLevel = MAX_HUNGER;
+                    }
                     foodLocation = where;
                 }
             }    
@@ -219,7 +242,12 @@ public class Bear extends Species
                 Pig pig = (Pig) species;
                 if(pig.isAlive()) {
                     pig.setDead();
-                    foodLevel = PIG_FOOD_VALUE;
+                    if(foodLevel+PIG_FOOD_VALUE <= MAX_HUNGER) {
+                        foodLevel += PIG_FOOD_VALUE;
+                    }
+                    else {
+                        foodLevel = MAX_HUNGER;
+                    }
                     foodLocation = where;
                 }
             }   
@@ -227,7 +255,25 @@ public class Bear extends Species
                 Raccoon raccoon = (Raccoon) species;
                 if(raccoon.isAlive()) {
                     raccoon.setDead();
-                    foodLevel = RACCOON_FOOD_VALUE;
+                    if(foodLevel+RACCOON_FOOD_VALUE <= MAX_HUNGER) {
+                        foodLevel += RACCOON_FOOD_VALUE;
+                    }
+                    else {
+                        foodLevel = MAX_HUNGER;
+                    }
+                    foodLocation = where;
+                }
+            }
+            else if (species instanceof Radish) {
+                Radish radish = (Radish) species;
+                if(radish.isAlive()) {
+                    radish.setDead();
+                    if(foodLevel+RADISH_FOOD_VALUE <= MAX_HUNGER) {
+                        foodLevel += RADISH_FOOD_VALUE;
+                    }
+                    else {
+                        foodLevel = MAX_HUNGER;
+                    }
                     foodLocation = where;
                 }
             }

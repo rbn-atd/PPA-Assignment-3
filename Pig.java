@@ -5,7 +5,6 @@ import java.util.Iterator;
 /**
  * A simple model of a pig
  * Pigs age, move, eat radishes and die.
- * Pigs live extremely long for some reason
  * They gain a larger amount of food value via radishes but also
  * lose 2 times as much hunger as other species.
  *
@@ -21,14 +20,14 @@ public class Pig extends Species
     // The age to which a pig can live.
     private static final int MAX_AGE = 500;
     // The likelihood of a pig breeding.
-    private static final double BREEDING_PROBABILITY = 0.4;
-    
-    private static final double FEMALE_PROBABILITY = 0.5;
+    private static final double BREEDING_PROBABILITY = 0.8;
     // The maximum number of births.
-    private static final int MAX_LITTER_SIZE = 4;
+    private static final int MAX_LITTER_SIZE = 3;
     // The food value of a single radish. In effect, this is the
     // number of steps a radish can go before it has to eat again.
-    private static final int PLANT_FOOD_VALUE = 30;
+    private static final int RADISH_FOOD_VALUE = 30;
+    //The maximum a pif can eat before becoming full
+    private static final int MAX_HUNGER = 150;
     // A shared random number generator to control breeding.
     private static final Random rand = Randomizer.getRandom();
     //A flag which determines the time of day this species moves.
@@ -36,10 +35,8 @@ public class Pig extends Species
     // Individual characteristics (instance fields).
     // The pig's age.
     private int age;
-    // The pig's food level, which is increased by eating rabbits.
+    // The pig's food level, which is increased by eating.
     private int foodLevel;
-    //The flag indicating the gender of a specific instance of a pig.
-    private boolean isFemale;
 
     /**
      * Create a pig. A pig can be created as a new born (age zero
@@ -57,11 +54,11 @@ public class Pig extends Species
         this.isFemale = isFemale;
         if(randomAge) {
             age = rand.nextInt(MAX_AGE);
-            foodLevel = rand.nextInt(PLANT_FOOD_VALUE);
+            foodLevel = rand.nextInt(RADISH_FOOD_VALUE);
         }
         else {
             age = 0;
-            foodLevel = PLANT_FOOD_VALUE;
+            foodLevel = RADISH_FOOD_VALUE;
         }
     }
     
@@ -136,7 +133,12 @@ public class Pig extends Species
                 Radish radish = (Radish) species;
                 if(radish.isAlive()) { 
                     radish.setDead();
-                    foodLevel = PLANT_FOOD_VALUE;
+                    if(foodLevel+RADISH_FOOD_VALUE <= MAX_HUNGER) {
+                        foodLevel += RADISH_FOOD_VALUE;
+                    }
+                    else {
+                        foodLevel = MAX_HUNGER;
+                    }
                     foodLocation = where;
                 }
             }
@@ -178,7 +180,7 @@ public class Pig extends Species
     }
 
     /**
-     * A pig can breed if it has reached the breeding age.
+     * A pig can breed if it has reached the breeding age and has a mate.
      */
     private boolean canBreed()
     {

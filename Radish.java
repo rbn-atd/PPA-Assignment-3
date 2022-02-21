@@ -23,7 +23,7 @@ public class Radish extends Species
     // A shared random number generator to control breeding.
     private static final Random rand = Randomizer.getRandom();
     
-    // Individual characteristics (instance fields).
+    
     
     // The radishes's age.
     private int age;

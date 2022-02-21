@@ -22,10 +22,8 @@ public class Rabbit extends Species
     private static final int MAX_AGE = 40;
     // The likelihood of a rabbit breeding.
     private static final double BREEDING_PROBABILITY = 0.9;
-    //The likelihood of a birth being female;
-    private static final double FEMALE_PROBABILITY = 0.5;
     // The maximum number of births.
-    private static final int MAX_LITTER_SIZE = 5;
+    private static final int MAX_LITTER_SIZE = 4;
     // A shared random number generator to control breeding.
     private static final Random rand = Randomizer.getRandom();
     //The probability a rabbit becomes diseased during its existence.
@@ -139,7 +137,7 @@ public class Rabbit extends Species
     }
 
     /**
-     * A rabbit can breed if it has reached the breeding age.
+     * A rabbit can breed if it has reached the breeding age and has a mate.
      * @return true if the rabbit can breed, false otherwise.
      */
     private boolean canBreed()

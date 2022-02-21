@@ -9,11 +9,14 @@
  */
 public class Weather
 {
-    // instance variables - replace the example below with your own
+    //multiple flags for different weather types
     private boolean isRaining = false;
     private boolean isSnowing = false;
     private boolean isSunny = false;
     
+    /**
+     * Returns weather message based of combination of the weather flags
+     */
     public String getWeather() {
         String weathertype = "Neutral";
         if( isRaining && !isSnowing && !isSunny ){
@@ -32,6 +35,7 @@ public class Weather
             return "Clear Day";
         }
     }
+    
     
     public void toggleRain() {
         isRaining = !isRaining;
