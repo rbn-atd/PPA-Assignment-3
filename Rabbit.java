@@ -70,7 +70,7 @@ public class Rabbit extends Species
         if(isAlive()) {
             giveBirth(newRabbits);
             if (rand.nextDouble() <= DISEASE_PROBABILITY ){
-                toggleIsDiseased();
+                toggleInfection();
                 System.out.println("Rabbit diseased");
             }
             // Try to move into a free location.

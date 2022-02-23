@@ -21,7 +21,7 @@ public abstract class Species
     //Flag for if the instance of a specie is female or not.
     protected boolean isFemale;
     //Flag for if the instance of a specie is diseased or not.
-    protected boolean isDiseased;
+    protected boolean isInfected;
     /**
      * Create a new species at location in field.
      * Randomly determines whether an instance is male of female.
@@ -40,7 +40,7 @@ public abstract class Species
         else {
             isFemale=false;
         }
-        this.isDiseased = false;
+        this.isInfected = false;
         setLocation(location);
     }
     
@@ -123,17 +123,17 @@ public abstract class Species
     /**
      * return if the species is diseased or not
      */
-    protected boolean getIsDiseased(){
-        return isDiseased;
+    protected boolean isInfected(){
+        return isInfected;
     }
     /**
      * toggles if the instance of a species is
      * positive with the disease.
      * @toggle true to false and vice versa
      */
-    protected void toggleIsDiseased()
+    protected void toggleInfection()
     {
-        isDiseased = !isDiseased;
+        isInfected = !isInfected;
     }
     
 }

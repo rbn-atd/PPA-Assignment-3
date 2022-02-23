@@ -43,17 +43,16 @@ public class Simulator
     private static final double SNOW_PROBABILITY = 0.01;
     //probabilty the weather will be set to sunny
     private static final double SUN_PROBABILITY = 0.75;
-    //boolean for whether a river will generate in the simulation
-    private static final boolean GENERATE_RIVER = false;
     //the fraction along the bottom of the field where the river will start from
     private static final double DEFAULT_RIVER_START = 0.4;
     //the fraction along the top of the field where the river will end
     private static final double DEFAULT_RIVER_END = 0.6;
+    //boolean for whether a river will generate in the simulation
+    private boolean GENERATE_RIVER = true;
     // List of species in the field.
     private List<Species> species;
-    // List of infected/diseased species in the field.
-    private List<Species> infected;
     
+    private int delay = 0;
     // The current state of the field.
     private Field field;
     // The current step of the simulation.
@@ -90,9 +89,7 @@ public class Simulator
         }
         
         species= new ArrayList<>();
-        
-        infected = new ArrayList<>();
-       
+    
         field = new Field(depth, width);
         
         weather = new Weather();
@@ -133,7 +130,7 @@ public class Simulator
     {
         for(int step = 1; step <= numSteps && view.isViable(field); step++) {
             simulateOneStep();
-            //delay(500);   // uncomment this to run more slowly
+            delay(delay);   // uncomment this to run more slowly
         }
     }
     
@@ -180,7 +177,7 @@ public class Simulator
         // Add the newly born foxes and rabbits to the main lists.
         species.addAll(newSpecies);
         
-        view.showStatus(step, time.getTimeOfDay(), weather.getWeather(), field);
+        view.showStatus(step, time.getTimeOfDay(), weather.getWeather(), field, getRiverString(), getDelay());
         if(GENERATE_RIVER) {
             if(step<200) {
                 generateRiver(DEFAULT_RIVER_START, DEFAULT_RIVER_END);
@@ -194,6 +191,7 @@ public class Simulator
     public void reset()
     {
         step = 0;
+        setDelay(0);
         species.clear();
         populate();
         if(GENERATE_RIVER) {
@@ -201,7 +199,7 @@ public class Simulator
         }
         
         // Show the starting state in the view.
-        view.showStatus(step, time.getTimeOfDay(), weather.getWeather(), field);
+        view.showStatus(step, time.getTimeOfDay(), weather.getWeather(), field, getRiverString(), getDelay());
     }
     
     /**
@@ -260,6 +258,7 @@ public class Simulator
             }
         }
     }
+    
     /**
      * Checks if a river is occupying a given location
      */
@@ -284,7 +283,42 @@ public class Simulator
             // wake up
         }
     }
-   
+    
+    public void setDelay(int newDelay) {
+        delay = newDelay;
+    }
+    
+    /**
+     * toggles the GENERATE_RIVER boolean flag between
+     * true and false (on and off).
+     * The grid is immediately reset for the river to be generated.
+     */
+    public void toggleRiver() {
+        GENERATE_RIVER = !GENERATE_RIVER;
+        reset();
+    }
+    
+    /**
+     * Returns a string passed into the showStatus method in SimulatorView
+     * which is then showed on the GUI showing whether a river is on or off;
+     */
+    private String getRiverString() {
+        if (GENERATE_RIVER == true){
+            return "On";
+        }
+        else {
+            return "Off";
+        }
+    }
+    
+    private String getDelay() {
+        if (delay == 0 ) {
+            return "Off";
+        }
+        else{
+            return "On";
+        }
+    }
     
     /**
      * Create a river

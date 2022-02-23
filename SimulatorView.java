@@ -28,7 +28,10 @@ public class SimulatorView extends JFrame
     private final String DAYLABEL_PREFIX = "Time: ";
     private final String STEPBUTTON_LABEL = "Step";
     private final String WEATHERLABEL_PREFIX = "Weather: ";
-    private JLabel stepLabel, population, infoLabel, dayLabel, weatherLabel;
+    private final String RIVERLABEL_PREFIX = "River: ";
+    private final String DELAYLABEL_PREFIX = "Delay: ";
+    private JLabel stepLabel, population, infoLabel, dayLabel, weatherLabel, riverLabel, delayLabel;
+    private JButton riverButton;
     
     private FieldView fieldView;
     //private Simulator sim;
@@ -53,7 +56,8 @@ public class SimulatorView extends JFrame
         population = new JLabel(POPULATION_PREFIX, JLabel.CENTER);
         dayLabel = new JLabel(DAYLABEL_PREFIX, JLabel.CENTER);
         weatherLabel = new JLabel(WEATHERLABEL_PREFIX, JLabel.CENTER);
-        
+        riverLabel = new JLabel(RIVERLABEL_PREFIX, JLabel.CENTER);
+        delayLabel = new JLabel(DELAYLABEL_PREFIX, JLabel.CENTER);
         
         setLocation(100, 50);
         
@@ -61,15 +65,24 @@ public class SimulatorView extends JFrame
 
         Container contents = getContentPane();
         
-        JPanel infoPane = new JPanel(new BorderLayout());
-            infoPane.add(stepLabel, BorderLayout.WEST);
-            infoPane.add(infoLabel, BorderLayout.CENTER);
-            infoPane.add(dayLabel, BorderLayout.CENTER);
-            infoPane.add(weatherLabel, BorderLayout.EAST);
+        JPanel infoPaneTop = new JPanel(new BorderLayout());
+            infoPaneTop.add(stepLabel, BorderLayout.WEST);
+            infoPaneTop.add(infoLabel, BorderLayout.CENTER);
+            infoPaneTop.add(dayLabel, BorderLayout.CENTER);
+            infoPaneTop.add(weatherLabel, BorderLayout.EAST);
             
-        contents.add(infoPane, BorderLayout.NORTH);
+        JPanel infoPaneBottom = new JPanel(new BorderLayout());
+            infoPaneBottom.add(riverLabel, BorderLayout.WEST);
+            infoPaneBottom.add(population, BorderLayout.CENTER);
+            infoPaneBottom.add(delayLabel, BorderLayout.EAST);
+            
+        JPanel infoPaneRight = new JPanel(new BorderLayout());    
+            
+        contents.add(infoPaneTop, BorderLayout.NORTH);
+        contents.add(infoPaneBottom, BorderLayout.SOUTH);
         contents.add(fieldView, BorderLayout.CENTER);
-        contents.add(population, BorderLayout.SOUTH);
+        
+        
         pack();
         setVisible(true);
     }
@@ -112,7 +125,7 @@ public class SimulatorView extends JFrame
      * @param step Which iteration step it is.
      * @param field The field whose status is to be displayed.
      */
-    public void showStatus(int step,String timeOfDay, String weather, Field field)
+    public void showStatus(int step,String timeOfDay, String weather, Field field, String riverString, String delayString)
     {
         if(!isVisible()) {
             setVisible(true);
@@ -121,6 +134,8 @@ public class SimulatorView extends JFrame
         stepLabel.setText(STEP_PREFIX + step);
         dayLabel.setText(DAYLABEL_PREFIX + timeOfDay);
         weatherLabel.setText(WEATHERLABEL_PREFIX + weather );
+        riverLabel.setText(RIVERLABEL_PREFIX + riverString );
+        delayLabel.setText(DELAYLABEL_PREFIX + delayString );
         stats.reset();
         
         fieldView.preparePaint();

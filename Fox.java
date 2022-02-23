@@ -157,8 +157,8 @@ public class Fox extends Species
                         foodLevel = MAX_HUNGER;
                     }
                     foodLocation = where;
-                    if(rabbit.getIsDiseased() && rand.nextDouble() <= DISEASE_PROBABILITY){
-                        toggleIsDiseased();
+                    if(rabbit.isInfected() && rand.nextDouble() <= DISEASE_PROBABILITY){
+                        toggleInfection();
                         diseaseEffect();
                         
                         System.out.println("Fox diseased");

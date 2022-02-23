@@ -217,8 +217,8 @@ public class Bear extends Species
                         foodLevel = MAX_HUNGER;
                     }
                     
-                    if(rabbit.getIsDiseased() && rand.nextDouble() <= DISEASE_PROBABILITY){
-                        toggleIsDiseased();
+                    if(rabbit.isInfected() && rand.nextDouble() <= DISEASE_PROBABILITY){
+                        toggleInfection();
                         diseaseEffect();
                         System.out.println("Bear diseased");
                     }
