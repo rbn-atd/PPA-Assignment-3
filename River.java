@@ -22,8 +22,8 @@ public class River extends BiomeFeature
 
     private void initialiseAnimalMovement()
     {
-        canMoveThrough.add(Eagle.class);
-        canMoveThrough.add(Bear.class);
+        canMoveThrough.add(Daemon.class);
+        canMoveThrough.add(Titan.class);
     }
     
     protected void setLocation(Location newLocation)

@@ -6,7 +6,7 @@ import java.awt.Color;
 
 /**
  * A simple predator-prey simulator, based on a rectangular field
- * containing rabbits, foxes, raccoons, bears, eagles, pigs, and radishes.
+ * containing fairies, grendlees, gnomes, titans, daemons, unicorns, and faegrasses.
  * Certain animals occaisionally get diseased.
  * 
  * @author David J. Barnes and Michael Kölling
@@ -20,22 +20,22 @@ public class Simulator
     private static final int DEFAULT_WIDTH = 300;
     // The default depth of the grid.
     private static final int DEFAULT_DEPTH = 300;
-    // The probability that a fox will be created in any given grid position.
-    private static final double FOX_CREATION_PROBABILITY = 0.07;
-    // The probability that a rabbit will be created in any given grid position.
-    private static final double RABBIT_CREATION_PROBABILITY = 0.18;
-    // The probability that a eagle will be created in any given grid position.
-    private static final double EAGLE_CREATION_PROBABILITY = 0.07;
-    // The probability that a radish will be created in any given grid position.
-    private static final double RADISH_CREATION_PROBABILITY = 0.1;
-    // The probability that a pig will be created in any given grid position.
-    private static final double PIG_CREATION_PROBABILITY = 0.18;
-    // The probability that a bear will be created in any given grid position.
-    private static final double BEAR_CREATION_PROBABILITY = 0.05;
-    // The probability that a raccoon will be created in any given grid position.
-    private static final double RACCOON_CREATION_PROBABILITY = 0.1;
-    //The probability a rabbit is already infected at creation
-    //Only rabbits will have such probability, acting as a vector for the disease.
+    // The probability that a grendle will be created in any given grid position.
+    private static final double GRENDLE_CREATION_PROBABILITY = 0.07;
+    // The probability that a fairy will be created in any given grid position.
+    private static final double FAIRY_CREATION_PROBABILITY = 0.18;
+    // The probability that a daemon will be created in any given grid position.
+    private static final double DAEMON_CREATION_PROBABILITY = 0.07;
+    // The probability that a faegrass will be created in any given grid position.
+    private static final double FAEGRASS_CREATION_PROBABILITY = 0.1;
+    // The probability that a unicorn will be created in any given grid position.
+    private static final double UNICORN_CREATION_PROBABILITY = 0.18;
+    // The probability that a titan will be created in any given grid position.
+    private static final double TITAN_CREATION_PROBABILITY = 0.05;
+    // The probability that a gnome will be created in any given grid position.
+    private static final double GNOME_CREATION_PROBABILITY = 0.1;
+    //The probability a fairy is already infected at creation
+    //Only fairies will have such probability, acting as a vector for the disease.
     private static final double DISEASE_CREATION_PROBABILITY = 0.7;
     //probability the weather will be set to rain
     private static final double RAIN_PROBABILITY = 0.02;
@@ -99,13 +99,13 @@ public class Simulator
         features = new ArrayList<>();
         // Create a view of the state of each location in the field.
         view = new SimulatorView(depth, width);
-        view.setColor(Rabbit.class, Color.ORANGE);
-        view.setColor(Fox.class, Color.BLUE);
-        view.setColor(Eagle.class, Color.MAGENTA);
-        view.setColor(Radish.class, Color.GREEN);
-        view.setColor(Pig.class, Color.PINK);
-        view.setColor(Bear.class, Color.RED);
-        view.setColor(Raccoon.class, Color.DARK_GRAY);
+        view.setColor(Fairy.class, Color.MAGENTA);
+        view.setColor(Grendle.class, Color.ORANGE);
+        view.setColor(Daemon.class, Color.RED);
+        view.setColor(Faegrass.class, Color.GREEN);
+        view.setColor(Unicorn.class, Color.YELLOW);
+        view.setColor(Titan.class, Color.DARK_GRAY);
+        view.setColor(Gnome.class, Color.BLUE);
         view.setColor(River.class, Color.CYAN);
         
         // Setup a valid starting point.
@@ -174,7 +174,7 @@ public class Simulator
                 it.remove();
             }
         }       
-        // Add the newly born foxes and rabbits to the main lists.
+        // Add the newly born creatures to the main lists.
         species.addAll(newSpecies);
         
         view.showStatus(step, time.getTimeOfDay(), weather.getWeather(), field, getRiverString(), getDelay());
@@ -212,47 +212,47 @@ public class Simulator
         field.clear();
         for(int row = 0; row < field.getDepth(); row++) {
             for(int col = 0; col < field.getWidth(); col++) {
-                if(rand.nextDouble() <= FOX_CREATION_PROBABILITY) {
+                if(rand.nextDouble() <= GRENDLE_CREATION_PROBABILITY) {
                     if(riverCheck(row, col)) {break;}
                     Location location = new Location(row, col);
-                    Fox fox = new Fox(true, field, location);
-                    species.add(fox);
+                    Grendle grendle = new Grendle(true, field, location);
+                    species.add(grendle);
                 }
-                else if(rand.nextDouble() <= RABBIT_CREATION_PROBABILITY) {
+                else if(rand.nextDouble() <= FAIRY_CREATION_PROBABILITY) {
                     if(riverCheck(row, col)) {break;}
                     Location location = new Location(row, col);
-                    Rabbit rabbit = new Rabbit(true, field, location);
-                    species.add(rabbit);
+                    Fairy fairy = new Fairy(true, field, location);
+                    species.add(fairy);
                 }
-                else if(rand.nextDouble() <= EAGLE_CREATION_PROBABILITY) {
+                else if(rand.nextDouble() <= DAEMON_CREATION_PROBABILITY) {
                     if(riverCheck(row, col)) {break;}
                     Location location = new Location(row, col);
-                    Eagle eagle = new Eagle(true, field, location);
-                    species.add(eagle);
+                    Daemon daemon = new Daemon(true, field, location);
+                    species.add(daemon);
                 }
-                else if(rand.nextDouble() <= RADISH_CREATION_PROBABILITY) { 
+                else if(rand.nextDouble() <= FAEGRASS_CREATION_PROBABILITY) { 
                     if(riverCheck(row, col)) {break;}
                     Location location = new Location(row, col);
-                    Radish radish = new Radish(true, field, location);
-                    species.add(radish);
+                    Faegrass faegrass = new Faegrass(true, field, location);
+                    species.add(faegrass);
                 }
-                else if(rand.nextDouble() <= PIG_CREATION_PROBABILITY) {
+                else if(rand.nextDouble() <= UNICORN_CREATION_PROBABILITY) {
                     if(riverCheck(row, col)) {break;}
                     Location location = new Location(row, col);
-                    Pig pig = new Pig(true, field, location);
-                    species.add(pig);
+                    Unicorn unicorn = new Unicorn(true, field, location);
+                    species.add(unicorn);
                 }
-                else if(rand.nextDouble() <= BEAR_CREATION_PROBABILITY) {
+                else if(rand.nextDouble() <= TITAN_CREATION_PROBABILITY) {
                     if(riverCheck(row, col)) {break;}
                     Location location = new Location(row, col);
-                    Bear bear = new Bear(true, field, location);
-                    species.add(bear);
+                    Titan titan = new Titan(true, field, location);
+                    species.add(titan);
                 }
-                else if(rand.nextDouble() <= RACCOON_CREATION_PROBABILITY) {
+                else if(rand.nextDouble() <= GNOME_CREATION_PROBABILITY) {
                     if(riverCheck(row, col)) {break;}
                     Location location = new Location(row, col);
-                    Raccoon raccoon = new Raccoon(true, field, location);
-                    species.add(raccoon);
+                    Gnome gnome = new Gnome(true, field, location);
+                    species.add(gnome);
                 }
                 // else leave the location empty.
             }
