@@ -34,7 +34,7 @@ public class Fox extends Species
     //The max a fox can eat before it is full
     private static final int MAX_HUNGER = 70;
     //The probability a fox will become infected when eating an infected rabbit.
-    private static final double DISEASE_PROBABILITY = 0.8;
+    private static final double DISEASE_PROBABILITY = 0.9;
     // A shared random number generator to control breeding.
     private static final Random rand = Randomizer.getRandom();
     //This species only acts at night.
@@ -211,6 +211,9 @@ public class Fox extends Species
         for(int b = 0; b < births && free.size() > 0; b++) {
             Location loc = free.remove(0);
             Fox young = new Fox(true, field, loc);
+            if(rand.nextDouble() <= DISEASE_PROBABILITY){
+                young.toggleInfection();
+            }
             newFoxes.add(young);
         }
     }

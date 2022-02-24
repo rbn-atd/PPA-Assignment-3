@@ -20,7 +20,7 @@ public class Raccoon extends Species
     // The age to which a raccoon can live.
     private static final int MAX_AGE = 200;
     // The likelihood of a raccoon breeding.
-    private static final double BREEDING_PROBABILITY = 0.18;
+    private static final double BREEDING_PROBABILITY = 0.25;
     // The maximum number of births.
     private static final int MAX_LITTER_SIZE = 6;
     //The food value gained by eating radishes

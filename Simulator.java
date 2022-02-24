@@ -29,7 +29,7 @@ public class Simulator
     // The probability that a radish will be created in any given grid position.
     private static final double RADISH_CREATION_PROBABILITY = 0.1;
     // The probability that a pig will be created in any given grid position.
-    private static final double PIG_CREATION_PROBABILITY = 0.1;
+    private static final double PIG_CREATION_PROBABILITY = 0.18;
     // The probability that a bear will be created in any given grid position.
     private static final double BEAR_CREATION_PROBABILITY = 0.05;
     // The probability that a raccoon will be created in any given grid position.

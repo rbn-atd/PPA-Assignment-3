@@ -18,7 +18,7 @@ public class Bear extends Species
     //The max age which a bear can live to
     private static final int MAX_AGE = 300;
     //The probability of a bear breeding
-    private static final double BREEDING_PROBABILITY = 0.04;
+    private static final double BREEDING_PROBABILITY = 0.02;
     //The maximum size of a litter of bear cubs
     private static final int MAX_LITTER_SIZE = 2;
     //The food value gained by eating rabbits
@@ -34,7 +34,7 @@ public class Bear extends Species
     //The max a bear can eat before being full
     private static final int MAX_HUNGER = 100;
     //The probability of a bear getting diseased
-    private static final double DISEASE_PROBABILITY = 0.7;
+    private static final double DISEASE_PROBABILITY = 0.8;
     //flag for whether bear is nocturnal
     private static final boolean isNocturnal = false;
     //A shared random number generator to control breeding
@@ -55,7 +55,6 @@ public class Bear extends Species
         super(field, location, isNocturnal);
         this.isFemale = isFemale;
         this.hungerLoss = 1;
-        //weather = new Weather();
         if(randomAge) {
             age = rand.nextInt(MAX_AGE);
             foodLevel = rand.nextInt((FOX_FOOD_VALUE+RADISH_FOOD_VALUE+PIG_FOOD_VALUE+RACCOON_FOOD_VALUE+RABBIT_FOOD_VALUE)/5);
@@ -188,6 +187,9 @@ public class Bear extends Species
         for(int b = 0; b < births && free.size() > 0; b++) {
             Location loc = free.remove(0);
             Bear young = new Bear(false, field, loc);
+            if(rand.nextDouble() <= DISEASE_PROBABILITY){
+                young.toggleInfection();
+            }
             newBears.add(young);
         }
     }
