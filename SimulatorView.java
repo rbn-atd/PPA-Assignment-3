@@ -30,8 +30,10 @@ public class SimulatorView extends JFrame
     private final String WEATHERLABEL_PREFIX = "Weather: ";
     private final String RIVERLABEL_PREFIX = "River: ";
     private final String DELAYLABEL_PREFIX = "Delay: ";
-    private JLabel stepLabel, population, infoLabel, dayLabel, weatherLabel, riverLabel, delayLabel;
-    private JButton riverButton;
+    private final String INFECTEDLABEL_PREFIX = "Infected: ";
+    private final String PAUSEBUTTON_PREFIX = "Pause";
+    private final String RESUMEBUTTON_PREFIX = "Resume";
+    private JLabel stepLabel, population, infoLabel, dayLabel, weatherLabel, riverLabel, delayLabel, infectedLabel;
     
     private FieldView fieldView;
     //private Simulator sim;
@@ -58,6 +60,7 @@ public class SimulatorView extends JFrame
         weatherLabel = new JLabel(WEATHERLABEL_PREFIX, JLabel.CENTER);
         riverLabel = new JLabel(RIVERLABEL_PREFIX, JLabel.CENTER);
         delayLabel = new JLabel(DELAYLABEL_PREFIX, JLabel.CENTER);
+        infectedLabel = new JLabel(INFECTEDLABEL_PREFIX, JLabel.CENTER);        
         
         setLocation(100, 50);
         
@@ -77,12 +80,13 @@ public class SimulatorView extends JFrame
             infoPaneBottom.add(delayLabel, BorderLayout.EAST);
             
         JPanel infoPaneRight = new JPanel(new BorderLayout());    
+            infoPaneRight.add(infectedLabel, BorderLayout.CENTER);
             
         contents.add(infoPaneTop, BorderLayout.NORTH);
         contents.add(infoPaneBottom, BorderLayout.SOUTH);
+        contents.add(infoPaneRight, BorderLayout.EAST);
         contents.add(fieldView, BorderLayout.CENTER);
-        
-        
+                   
         pack();
         setVisible(true);
     }
@@ -158,7 +162,8 @@ public class SimulatorView extends JFrame
             }
         }
         stats.countFinished();
-
+        
+        infectedLabel.setText(INFECTEDLABEL_PREFIX + stats.generateInfectedCount(field));
         population.setText(POPULATION_PREFIX + stats.getPopulationDetails(field));
         fieldView.repaint();
     }

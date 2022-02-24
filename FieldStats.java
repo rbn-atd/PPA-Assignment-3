@@ -7,12 +7,15 @@ import java.util.HashMap;
  * for any class of object that is found within the field.
  * 
  * @author David J. Barnes and Michael Kölling
- * @version 2016.02.29
+ *         with Reuben Atendido and Oliver Macpherson
+ * @version 23/02/2022 (2)
  */
 public class FieldStats
 {
     // Counters for each type of entity (fox, rabbit, etc.) in the simulation.
     private HashMap<Class, Counter> counters;
+    
+    private int infectedCount;
     // Whether the counters are currently up to date.
     private boolean countsValid;
 
@@ -58,6 +61,7 @@ public class FieldStats
             Counter count = counters.get(key);
             count.reset();
         }
+        infectedCount=0;
     }
 
     /**
@@ -124,5 +128,30 @@ public class FieldStats
             }
         }
         countsValid = true;
+    }
+    
+    /**
+     * Iterates through the grid space and checks for every
+     * infected species and increments the infected counter
+     */
+    
+    public int generateInfectedCount(Field field)
+    {
+        //reset();
+        for(int row = 0; row < field.getDepth(); row++) {
+            for(int col = 0; col < field.getWidth(); col++) {
+                Object species = field.getObjectAt(row, col);
+                if(species != null) {
+                    if (species instanceof River) {}//Do nothing
+                    else{
+                        Species animal = (Species) species;
+                        if(animal.isInfected()) {
+                            infectedCount++;
+                        }
+                    }
+                }
+            }
+        }
+        return infectedCount++;
     }
 }
