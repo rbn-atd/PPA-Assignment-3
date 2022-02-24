@@ -14,7 +14,7 @@ public class FieldStats
 {
     // Counters for each type of entity (fox, rabbit, etc.) in the simulation.
     private HashMap<Class, Counter> counters;
-    
+    //Counter for all infected animals regardless of species.
     private int infectedCount;
     // Whether the counters are currently up to date.
     private boolean countsValid;
