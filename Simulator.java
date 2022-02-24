@@ -311,6 +311,10 @@ public class Simulator
         }
     }
     
+    /**
+     * Return delay integer, if >0 then return to GUI that delay is on
+     * or else it is displayed off.
+     */
     private String getDelay() {
         if (delay == 0 ) {
             return "Off";
