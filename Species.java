@@ -104,7 +104,6 @@ public abstract class Species
     {
         return field;
     }
-    
     /**
      * Return the specie's nocturnal flag
      * @return if the species is nocturnal true or false
@@ -113,7 +112,6 @@ public abstract class Species
     {
         return isNocturnal;
     }
-    
     /**
      * return the specie's female truth value
      * given this is false then the instance is male.
@@ -122,14 +120,12 @@ public abstract class Species
     {
         return isFemale;
     }
-    
     /**
      * return if the species is diseased or not
      */
     protected boolean isInfected(){
         return isInfected;
     }
-    
     /**
      * toggles if the instance of a species is
      * positive with the disease.

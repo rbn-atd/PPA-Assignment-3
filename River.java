@@ -19,19 +19,13 @@ public class River extends BiomeFeature
         super(field, location);
         setLocation(location);
     }
-    
-    /**
-     * Allows certain species to pass through grid space occupied by River.
-     */
+
     private void initialiseAnimalMovement()
     {
         canMoveThrough.add(Daemon.class);
         canMoveThrough.add(Titan.class);
     }
     
-    /**
-     * Place river object onto a new location on the grid.
-     */
     protected void setLocation(Location newLocation)
     {
         if(location != null) {

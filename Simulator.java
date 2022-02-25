@@ -47,6 +47,12 @@ public class Simulator
     private static final double DEFAULT_RIVER_START = 0.4;
     //the fraction along the top of the field where the river will end
     private static final double DEFAULT_RIVER_END = 0.6;
+    //probability of animal death in adverse weather
+    private static final double WEATHER_DEATH_CHANCE = 0.01;
+    //probability of animal acting when its raining
+    private static final double RAIN_ACT_CHANCE = 0.7;
+    //probability of animal acts when its snowing
+    private static final double SNOW_ACT_CHANCE = 0.4;
     //boolean for whether a river will generate in the simulation
     private boolean GENERATE_RIVER = true;
     // List of species in the field.
@@ -167,8 +173,22 @@ public class Simulator
         for(Iterator<Species> it = species.iterator(); it.hasNext(); ) {
             Species species = it.next();
             //species do not act if it is both snowing and raining, and only act in their respective times of day
-            if ((!weather.getSnow() || !weather.getRain()) && ( (species.getIsNocturnal() && !time.getIsDay()) || (!species.getIsNocturnal() && time.getIsDay())  )) {
+            if ((weather.getWeather().equals("Clear Day")) && (canAct(species))) {
                 species.act(newSpecies);
+            }
+            else if((weather.getWeather().equals("Exceedingly Hot")) && (canAct(species))) {
+                species.act(newSpecies);
+                weatherDamage(species);
+            }
+            else if((weather.getWeather().equals("Nicely Snowing")) && (canAct(species))) {
+                if(rand.nextDouble() <= SNOW_ACT_CHANCE) {
+                    species.act(newSpecies);
+                }
+            }
+            else if((weather.getWeather().equals("Drab Rain")) && (canAct(species))) {
+                if(rand.nextDouble() <= RAIN_ACT_CHANCE) {
+                    species.act(newSpecies);
+                }
             }
             if(!species.isAlive()) {
                 it.remove();
@@ -311,16 +331,31 @@ public class Simulator
         }
     }
     
-    /**
-     * Return delay integer, if >0 then return to GUI that delay is on
-     * or else it is displayed off.
-     */
     private String getDelay() {
         if (delay == 0 ) {
             return "Off";
         }
         else{
             return "On";
+        }
+    }
+    
+    /**
+     * Returns whether a creature can act based on the time and whether its nocturnal.
+     * @param species The animal to check
+     */
+    private boolean canAct(Species species) {
+        return (species.getIsNocturnal() && !time.getIsDay()) || (!species.getIsNocturnal() && time.getIsDay());
+    }
+    
+    /**
+     * Method for a chance to kill an animal based on constant. To be called when the whether is dangerous.
+     * @param species The animal to attempt to kill
+     */
+    private void weatherDamage(Species species) {
+        Random rand = Randomizer.getRandom();
+        if(rand.nextDouble() <= WEATHER_DEATH_CHANCE) {
+            species.setDead();
         }
     }
     
