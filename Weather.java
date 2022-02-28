@@ -36,27 +36,44 @@ public class Weather
         }
     }
     
-    
+     /**
+     * Toggle rain between true and false
+     */
     public void toggleRain() {
         isRaining = !isRaining;
     }
     
+    /**
+     * Toggle snow between true and false
+     */
     public void toggleSnow() {
         isSnowing = !isSnowing;
     }
     
+    /**
+     * Toggle sun between true and false
+     */
     public void toggleSun() {
         isSunny = !isSunny;
     }
     
+    /**
+     * Return boolean value for if it is snowing.
+     */
     public boolean getSnow() {
         return  isSnowing;
     }
     
+    /**
+     * Return boolean value for if it is raining.
+     */
     public boolean getRain() {
         return isRaining;
     }
     
+    /**
+     * Return boolean value for if it is sunny.
+     */
     public boolean getSun() {
         return isSunny;
     }
