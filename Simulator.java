@@ -57,8 +57,8 @@ public class Simulator
     private boolean GENERATE_RIVER = true;
     // List of species in the field.
     private List<Species> species;
-    
-    private int delay = 0;
+    //default delay in ms
+    private int delay = 150;
     // The current state of the field.
     private Field field;
     // The current step of the simulation.
@@ -145,6 +145,7 @@ public class Simulator
      * Iterate over the whole field updating the state of each species.
      * This method has been modified now to toggle between day and night if
      * the step count is divisible by 2.
+     * It also calls methods to change grid color depending on time of day.
      */
     public void simulateOneStep()
     {
@@ -153,8 +154,19 @@ public class Simulator
         //String timeTag = ""
         //toggle between day and night every 2 steps
         //This means 1 full day is 4 steps
-        if(step % 2 == 0){
+        if (step % 2 == 1) {
+            view.setTransitionColor(); //odd numbered steps change the grid to gray for a more smooth looking transition to day and night.
+        }
+        else if(step % 2 == 0){
             time.toggleDayAndNight();
+            //every 2 steps the background changes between black and white 
+            //as a visual indicator of day and night.
+            if(time.getIsDay()) {
+                view.setDayColor();
+            }
+            else {
+                view.setNightColor();
+            }
         }
         //toggle weather depending on their probabilities of occurring
         if(rand.nextDouble() <= RAIN_PROBABILITY) {
@@ -211,7 +223,7 @@ public class Simulator
     public void reset()
     {
         step = 0;
-        setDelay(0);
+        setDelay(150);
         species.clear();
         populate();
         if(GENERATE_RIVER) {

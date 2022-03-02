@@ -18,7 +18,7 @@ import java.util.Map;
 public class SimulatorView extends JFrame
 {
     // Colors used for empty locations.
-    private static final Color EMPTY_COLOR = Color.white;
+    private Color EMPTY_COLOR = Color.white;
 
     // Color used for objects that have no defined color.
     private static final Color UNKNOWN_COLOR = Color.gray;
@@ -41,6 +41,8 @@ public class SimulatorView extends JFrame
     private Map<Class, Color> colors;
     // A statistics object computing and storing simulation information
     private FieldStats stats;
+    
+    private Time time;
 
     /**
      * Create a view of the given width and height.
@@ -175,6 +177,24 @@ public class SimulatorView extends JFrame
     public boolean isViable(Field field)
     {
         return stats.isViable(field);
+    }
+    /**
+     * changes empty color field to black
+     */
+    public void setNightColor() {
+            EMPTY_COLOR = Color.black;
+    }
+    /**
+     * changes empty color field to white
+     */
+    public void setDayColor() {
+            EMPTY_COLOR = Color.white;
+    }
+    /**
+     * changes empty color field to gray
+     */
+    public void setTransitionColor() {
+            EMPTY_COLOR = Color.gray;
     }
     
     /**
