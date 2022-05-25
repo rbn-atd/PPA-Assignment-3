@@ -147,7 +147,7 @@ public class Field
             return free.get(0);
         }
         else {
-            return null;
+            return null ;
         }
     }
 
